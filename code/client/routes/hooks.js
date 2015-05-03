@@ -44,7 +44,8 @@ Router.onBeforeAction(checkUserLoggedIn, {
     'signup',
     'login',
     'recover-password',
-    'reset-password'
+    'reset-password',
+    'grindage'
   ]
 });
 

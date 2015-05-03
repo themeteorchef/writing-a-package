@@ -5,5 +5,6 @@
 */
 
 customBrowserPolicies = function(){
-  // Define any custom browser policies here.
+  BrowserPolicy.content.allowOriginForAll('https://www.youtube.com');
+  BrowserPolicy.content.allowOriginForAll('https://youtube.com');
 }
