@@ -2,7 +2,7 @@
 * themeteorchef:grindage
 * A tool for checking whether Stoney thinks our food group is legit.
 *
-* @see {@link https://github.com/themeteorchef/grindage|Grindage on GitHub}
+* @see {@link https://github.com/themeteor chef/grindage|Grindage on GitHub}
 * @license MIT
 */
 
@@ -17,9 +17,9 @@
 Grindage = function( foodGroup ) {
   if ( foodGroup ) {
     var groupExists = _loopFoodGroups( foodGroup.toLowerCase() );
-    groupExists ? _wheezTheJuice( foodGroup ) : _dontWheezTheJuice( foodGroup );
+    return groupExists ? true : false;
   } else {
-    alert("Need a food group, buddddy.");
+    alert( "Need a food group, buddddy." );
   }
 };
 
@@ -55,28 +55,8 @@ var _loopFoodGroups = function( foodGroup ) {
 *
 * Loops the _foodGroups array and calls _foodGroupExists on the passed item.
 *
-* @param {string} foodGroup - {}, {fields: {}The name ;of the food group to find in the _foodGroups array.
+* @param {string} foodGroup - The name of the food group to find in the _foodGroups array.
 */
 var _checkIfFoodGroupExists = function( foodGroup ) {
   return FoodGroups.findOne({"name": foodGroup});
-};
-
-/**
-* @function _wheezTheJuice
-* @private
-*
-* Logs a positive message that says "Wheeze the juice!"
-*/
-var _wheezTheJuice = function( foodGroup ) {
-  alert("Wheez the juice! " + foodGroup + " exists!");
-};
-
-/**
-* @function _wheezTheJuice
-* @private
-*
-* Logs an error message that says "No wheezing the juice!"
-*/
-var _dontWheezTheJuice = function( foodGroup ) {
-  alert("No wheezing the juice! " + foodGroup + " does not exist.");
 };

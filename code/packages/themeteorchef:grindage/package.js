@@ -50,9 +50,21 @@ Package.onUse(function(api) {
 });
 
 Package.onTest(function (api) {
-  // api.use("tinytest");
-  // api.use("morsel:money");
-  //
-  // api.addFiles("tests/shared/index.js", ["client", "server"]);
 
+  // In order to test our code we need to load in the tinytest package along
+  // with our package. Note: we expose both to the client and the server as our
+  // package and tests need to run on both.
+  api.use([
+    "tinytest",
+    "themeteorchef:grindage"
+  ], ['client', 'server']);
+
+  // Load in each of our test files. Here, we have two files: one for client and
+  // one for server. Note that in order to tell tinytest where the tests should
+  // run, we pass either a "client" or "server" string after the file. You are
+  // not required to put your tests in a /client or /server directory. They can
+  // live in the /tests directory just fine. The only thing that matters is
+  // passing the "client" or "server" string.
+  api.addFiles("tests/client/client-tests.js", "client");
+  api.addFiles("tests/server/server-tests.js", "server");
 });
