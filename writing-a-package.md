@@ -134,7 +134,10 @@ For the summary, the name of the game is: keep it short. This should be one sent
 Versioning your package is essential, as it's how Meteor knows to share new releases of your package with users. We'll discuss versioning your package in detail later, but it's important to know that whenever you make a change to your package, you will need to change this number before you publish the release.
 
 ##### Git
-Lastly, we have a git field. This is simply meant as a way to link a repository to a package. This _does not_ sync your package code with GitHub. It's just a link. This field is entirely optional and usually reserved for public packages. A good rule of thumb: if it's an open source, public package, make sure it has a GitHub repo. If it's closed source and just for you (or your team), add a repo at your discretion.
+This is simply meant as a way to link a repository to a package. This _does not_ sync your package code with GitHub. It's just a link. This field is entirely optional and usually reserved for public packages. A good rule of thumb: if it's an open source, public package, make sure it has a GitHub repo. If it's closed source and just for you (or your team), add a repo at your discretion.
+
+##### Documentation
+Lastly, we have the documentation field. This accepts a single string pointing to the documentation for your package, relative _to_ your package code. In our case, we've set this to be equal to `"README.md"` (also the default). Note: we've used no path here as our `README.md` file is located in the root of our package.
 
 Making sure these fields exist in your `Package.describe` block is helpful to other developers looking at your code. Even if they're not 100% required, if your goal is to share with others, make sure they're filled out properly.
 
@@ -319,15 +322,210 @@ This means that when Tinytest runs the test, it will take the file with the arch
 Boom! That completes our `package.js` file. It was a lot to cover, but hopefully we now know what we need to know to write our package, test it, and get it out into the real world. Onward!
 
 #### Advanced Package APIs
-Wait, wait, wait. We need to discuss advanced package APIs first. There are a few things we haven't covered here that can also be used in your package code.
+Wait, wait, wait. We need to discuss advanced package APIs first. There are a few things we haven't covered here that can also be used in your package code. Let's take a quick look at what's available.
 
-# Writing Package Code
-- File Organization
-- Global vs. Local Variables
-- Keeping Code Clean
-- Documenting APIs with JSDOC
+##### Npm.depends
+Similar to the `api.use()` method we covered above that allows you to depend on _Meteor_ packages, the `Npm.depends()` method allows you to pull in [NPM packages](https://www.npmjs.com/). What's nice about this is that you can easily incorporate functionality from an NPM package that hasn't made it to Meteor yet. This is a good place to start when you're working with things like third-party APIs that are likely to have an NPM package available. Note: calls to `Npm.depends()` also live in your `package.js` file and are included in their own block outside of `Package.onUse()`:
 
-# Writing Tests for Package Code
+<p class="block-header">package.js</p>
+```.lang-javascript
+Package.describe({
+  [...]  
+});
+
+Npm.depends({
+  "connect": "2.13.0"
+});
+
+Package.onUse(function(api){
+  [...]  
+});
+
+Package.onTest(function(api){
+  [...]
+});
+```
+
+##### Npm.require()
+The sister function of `Npm.depends()`, `Npm.require()` is what you use to actually _load_ the package included using `Npm.depends()`. `Npm.require()` calls are used _inside of_ your package code. For example, if one of your package files contained a few methods:
+
+<p class="block-header">/packages/examplepackage/server/methods.js</p>
+```.lang-javascript
+  ExampleAPI = Npm.require('npm-package-name');
+
+  Meteor.methods({
+    methodAddedByPackage: function() {
+      ExampleAPI.method(...);
+    }
+  });
+```
+
+##### Cordova.depends()
+This is one I'm not terribly familiar with but seems to work akin to `Npm.depends()` with the difference being that you use [Cordova/PhoneGap plugins](http://plugins.cordova.io/#/) instead. This, of course, would be used if your package was meant for a Cordova app intended for devices (not just the browser).
+
+##### Package.registerBuildPlugin
+The idea behind `Package.registerBuildPlugin()` is to add functionality to the compilation of files during Meteor's build process. A good example of this would be if you wanted to compile one file type into another (e.g. compiling CoffeeScript into JavaScript).
+
+The idea is that when Meteor goes to build, it will see your build plugin registered and then (based on the source handlers you've added using `Plugin.registerSourceHandler()`), process each file matching a given file type (e.g. `.coffee`) using the plugin script you've written. The whole thing is a bit heady, but if you're looking to write a package that processes Meteor files in some way, this is your ticket.
+
+If you're curious, take a peek at the [CoffeeScript package source](https://github.com/meteor/meteor/tree/devel/packages/coffeescript) that's shipped as part of Meteor core.
+
+<div class="note">
+  <h3>A quick note</h3>
+  <p>That's it for Advanced APIs and all of the standard APIs that you'll need to understand in order to write a package. Now, we'll jump into writing our example package, testing it, and getting it published!</p>
+</div>
+
+### Writing Package Code
+Okay! So now that we have a decent understanding of how to organize our `package.js` file, we can get into writing the actual package code. Keep in mind: what follows in this section is pretty opinionated, so take it with a grain of salt. You can, will, and _should_ have your own opinions about this stuff. What I'm showing here is simply my take on it and you're encouraged to remix the hell out of it for your own needs. Ready? Let's dig in!
+
+#### File Organization
+Similar to when you first start out writing Meteor applications, you may wonder "how do I organize my package code?" Good question! Not to burst your bubble, but very similar to Meteor applications: there's very little convention. In fact, you can get away with _no_ organization strategy if you want and put all of your files in the root directory for your package (e.g. `/packages/grindage`). Let's explore how Grindage has been organized and why.
+
+<p class="block-header">/path/to/file</p>
+```.lang-bash
+/grindage
+--- /lib
+------ /collections
+------ /controllers
+------ /modules
+------ /publications
+------ /routes
+------ /stylesheets
+------ /templates
+------ startup.js
+--- /tests
+------ /client
+--------- client-tests.js
+------ /server
+--------- server-tests.js
+--- package.js
+--- README.md
+```
+
+Inside of the `/grindage` directory, we have two extra directories: `lib` and `tests` along with two files, `package.js` (what we covered above) and `README.md`.
+
+##### /lib
+Lib here is short for library. The point of this directory is to store all of _our_ package code. This is merely a convention, but helps us to keep everything neat and tidy. This includes each of the files that we added using `api.addFiles()`.
+
+Notice, too, that we've further separated our code within the `/lib` directory by purpose/function. This is purely by my own taste. We could easily move everything in these folders to be in the root of `/lib` or in the root of the package. S'up to you.
+
+The reason I've chosen to use this separation is that it makes it very clear what each file is responsible for to other developers.
+
+##### /tests
+Pretty clear, this directory contains our tests. Inside we have two separate directories, each containing a file: `/client` and `/server`. Just like with `/lib`, this is purely for clarity.
+
+Remember: running tests on the client or server _does not_ require that you put files into a `/client` or `/server` directory. Rather, we designate where tests should be run using the string after we load our file `api.addFiles("/path/to/my/test/file.js", "client")`.
+
+##### Root Files
+The only true convention for organizing our package is to ensure that we have a `package.js` and a `README.md` in the root. Technically, we can put the `README.md` wherever we'd like and just update the `documentation` parameter in our `Package.describe()` block within `package.js`. However, we're kind souls and want to make browsing our package code easy peasy for our fellow developers.
+
+#### Global vs. Local Variables
+Remember earlier when we used the `api.export()` method to expose global variables from within our package? This is where it all comes together. Let's take a quick look at the source of `/lib/modules/grindage.js`:
+
+<p class="block-header">/path/to/file</p>
+```.lang-javascript
+Grindage = function( foodGroup ) {
+  if ( foodGroup ) {
+    var groupExists = _loopFoodGroups( foodGroup.toLowerCase() );
+    return groupExists ? true : false;
+  } else {
+    alert( "Need a food group, buddddy." );
+  }
+};
+
+var _getFoodGroups = function() {
+  var getFoodGroups = FoodGroups.find( {}, { fields: { "_id": 1 } } ).fetch();
+  return getFoodGroups;
+}
+
+var _loopFoodGroups = function( foodGroup ) {
+  var groups = _getFoodGroups();
+  for( var i = 0; i < groups.length; i++ ) {
+    return _checkIfFoodGroupExists( foodGroup ) ? true : false;
+  }
+};
+
+var _checkIfFoodGroupExists = function( foodGroup ) {
+  return FoodGroups.findOne({"name": foodGroup});
+};
+```
+
+A handful of functions. Simple. But let's pay attention to _how_ we've defined those functions. Notice that every function in this file except for `Grindage` is prefixed with `var`. This means that all of these functions are only visible within this file (private). Nowhere else.
+
+The reason for this structure is that we don't want to dump a bunch of global variables into our user's namespace (nor do we want to export every single function in our package).
+
+Technically, Meteor helps us out a bit by wrapping all of our package code in an anonymous function, meaning our variables are automatically scoped to the current file and don't leak out. _However_, it's still wise to pop a `var` in front of _any variable that isn't intended to be exposed to the public_.
+
+Beyond just isolating our code, this has a bigger point, too, tying back to our `api.export()` method. By convention, Meteor will only allow us to export _global_ variables (not prefixed with `var`) from our package. If a variable isn't made global, it can't see it and the export will throw an error. In turn, this means that if our package needs to be exposed to our users: it must be global.
+
+Again, unless we explicitly _export_ our variable (global irrelevant), our users will not be able to see it. Only our package.
+
+#### Keeping Code Clean
+Put your pitchfork aside for a second. Is it down? Is it?! Okay. So, when it comes to writing code for others, we should give a damn. We should be concerned with more than just getting it to work. We should make it _understandable_.
+
+Now, many, many—seriously, put the pitchfork down—developers will complain and say this is bullshit. That's fine. But a good philosophy to maintain (or at the very least, research) is the concept of writing "clean code." The idea, here, is that we write code in such a way that it's easily read by other people.
+
+Because we're writing code that (generally speaking) is intended for public consumption, it should behoove us to make sure that our code is as clean and tidy as possible. Okay hotshot...what exactly does that mean?
+
+When it comes to our package code, it means doing things like:
+
+- Using explicit naming (e.g. naming a function for what it does instead of something arbitrary — `nameFunction = function(name){ console.log(name); }` vs `logsNameToConsole = function(name) { console.log(name); }`).
+- Breaking large functions into several smaller functions that are responsible for one thing only.
+- Using documentation for public APIs.
+
+All of this stuff is hyper-opinionated. You don't _need_ to do these things in order to write packages. Rather, you should be considerate of these things _while_ writing packages. The overarching point is that you should assume someone, at some point, will be reading your code.
+
+Pedantic fussiness aside, you should want that code to be easily read and understood by other developers. This helps other people to suggest improvements, quickly spot bugs, and even to make their own contributions.
+
+All of these things, if at least considered, can help to give your package a bit of momentum. The more time you invest in keeping things tidy, the more likely developers will be to trust your code and use it in their own projects.
+
+<div class="note">
+  <h3>A quick note</h3>
+  <p>Something I've enjoyed recently that's helped me to wrap my head around all of this stuff is a <a href="http://www.amazon.com/Clean-Code-Handbook-Software-Craftsmanship/dp/0132350882">book</a> and <a href="https://cleancoders.com/category/clean-code#videos">screencast series</a> by a guy who goes by "Uncle Bob Martin." He's an older, experience deveoper who's developed a solid phiolosophy around writing clean code. It's worth hearing him out as a lot of his stuff can help to make immediate improvements in your work.</p>
+</div>
+
+#### Documenting APIs with JSDOC
+In conjunction with writing clean code is _documenting_ your code. Now, this can be seen as unnecessary and a bit excessive. But, playing to our concept above, it's all about making your code easy to understand.
+
+[JSDoc](http://usejsdoc.org/) is a code documentation standard that helps you to comment your code in a meaningful way. It also helps you to auto-generate documentation for your code in the form of HTML files. To get an idea of what we're talking about, let's look at an example from Grindage.
+
+<p class="block-header">/path/to/file</p>
+```.lang-javascript
+/**
+* themeteorchef:grindage
+* A tool for checking whether Stoney thinks our food group is legit.
+*
+* @see {@link https://github.com/themeteor chef/grindage|Grindage on GitHub}
+* @license MIT
+*/
+
+/**
+* @function Grindage
+* @public
+*
+* Takes the passed food group and checks whether it's valid.
+*
+* @param {string} foodGroup - The name of the food group to test.
+*/
+Grindage = function( foodGroup ) {
+  if ( foodGroup ) {
+    var groupExists = _loopFoodGroups( foodGroup.toLowerCase() );
+    return groupExists ? true : false;
+  } else {
+    alert( "Need a food group, buddddy." );
+  }
+};
+```
+
+See that stuff wrapped in comments? That's JSDoc. It's nothing but comments. The trick is in the `/**` part at the top of the comment. That is how JSDoc _parses_ the comments in your code to turn them into HTML files. The point, here, though, is to look at what we're doing.
+
+Instead of just dropping a mess of code, we're clearly defining what each chunk is meant to do, what parameters our functions accept (along with the type), and adding meta information to help other developers find their way.
+
+Again, this may all seem unnecessary and it's certainly not required. The point of this is to make your code easier to understand. JSDoc gives us a common language and pattern to follow so that other developers can _quickly_ read our comments and know what we're doing.
+
+Before you publish a package, consider spending some time writing JSDoc comments to make your code a little easier to navigate.
+
+### Writing Tests for Package Code
 - What is a test?
 - Why do we test?
 - How do we test?
@@ -335,22 +533,37 @@ Wait, wait, wait. We need to discuss advanced package APIs first. There are a fe
 - What should we test?
 - Running tests
 
-# Writing a README
+### Writing a README
 - Defining what the package is for.
 - Explaining the API.
 - Outlining Tests and Running Tests
 - Providing a License
 
-# Versioning Your Package Code
+### Versioning Your Package
 - Using Semvers
 - Updating Package.js
 - Tagging on GitHub
 
-# Releasing Your Package Code
+### Releasing Your Package
 - Releasing a New Package
 - Releasing an Update to an Existing Package
 
-# Maintaining Your Package Code
-- Responding to Issues
-- Testing Issues
-- Updating Code
+### Maintaining Your Package
+When it comes to maintaining your package (keeping it up to date, fixing bugs, etc), it's important to develop some sort of process. After you've shipped your first version, it's guaranteed that it will have some bugs, areas for improvement, and pick up feature suggestions from the community. How do we go about maintaing our package?
+
+#### GitHub Issues
+This is the simplest and most effective way (I've found) to manage your package code. If you've never tried them out, [GitHub Issues]() allow you to create chronological "todo lists" tied directly to your code. For example, you can add a new issue and label it as a "bug." If you have a new idea for a feature, you can label it as "feature." GitHub imposes no naming conventions, so you can call your labels whatever you'd like.
+
+In addition to being able to add issues yourself, GitHub also allows other people to submit issues, too. This is handy as it allows developers who bump into bugs or come up with feature ideas to easily submit new ideas. **When it comes to issues: respond**.
+
+If even to just sort or organize an issue into some label, make sure you do it. This makes it easy for other developers to trust your package and even dedicate time to helping you maintaing it. It's also common courtosey. The people installing your package are likely using it in their day-to-day work and nothing is more frustrating than seeing your issue (whether its valid or not) being ignored.
+
+#### Responding to Issues
+Beyond just responding to issues, how you respond is important, too. When you respond, try to get as much information as you can about the bug or feature request. It's helpful to ask for things like a demo link or a [Gist]() to help you debug. It's perfectly okay to say "I don't know," but work to figure out what the issue is and help the other developer to resolve the problem. Be polite, too. Someone has given enough damns to use your package. Even if they're a little salty, help them out.
+
+#### Testing Issues
+Fixing code isn't enough. You also need to _test your fixes_ to confirm that they work. This should be common sense, but when a bug is reported a good practice is to open up a new branch on your package's repo and perform the fix. Run your Meteor server to confirm the bug _and_ the fix. Once you're certain a bug is fixed, close out the branch and merge it with master (following the versioning steps above).
+
+Once a fix is merged, deploy it to the GitHub repo with a tag and then publish the update to Meteor using the `meteor publish` command.
+
+#### Updating Code

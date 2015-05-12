@@ -1,8 +1,9 @@
 Package.describe({
   name: "themeteorchef:grindage",
-  summary: "Learn the four basic food groups, buddddddy.",
+  summary: "A tool for checking whether Stoney thinks our food group is legit.",
   version: "1.0.0",
-  git: "https://github.com/themeteorchef/grindage"
+  git: "https://github.com/themeteorchef/grindage",
+  documentation: "README.md"
 });
 
 Package.onUse(function(api) {
