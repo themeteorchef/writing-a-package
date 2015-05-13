@@ -2,7 +2,7 @@ Tinytest.add('Is the grindage template available on the client?', function( test
   // Here we're using the javascript typeof operator to check whether or not
   // Template.grindage is an object. If Template.grindage is defined, its type
   // should be an object. If it's not, this would return undefined.
-  test.equal( typeof Template.grindage, "object" );
+  test.equal( typeof Template.grindage, "tacos" );
   // Here we can see the inverse of the test above. Here we're saying
   // "Template.grindage should not equal undefined." This and the above test
   // achieve the same thing, so pick whichever syntax is easier to grok.

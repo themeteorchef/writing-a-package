@@ -378,6 +378,11 @@ If you're curious, take a peek at the [CoffeeScript package source](https://gith
 ### Writing Package Code
 Okay! So now that we have a decent understanding of how to organize our `package.js` file, we can get into writing the actual package code. Keep in mind: what follows in this section is pretty opinionated, so take it with a grain of salt. You can, will, and _should_ have your own opinions about this stuff. What I'm showing here is simply my take on it and you're encouraged to remix the hell out of it for your own needs. Ready? Let's dig in!
 
+<div class="note">
+  <h3>A quick note</h3>
+  <p>We're not going to get too much into the actual code of this package, but rather, use that code as an achor to explore concepts. It's highly recommended that you <a href="https://github.com/themeteorchef/writing-a-package/tree/master/code/packages/themeteorchef:grindage">read through the source of the package on GitHub</a> to understand how all of the pieces fit together. The tricky stuff is annotated so you're not left in the dark.</p>
+</div>
+
 #### File Organization
 Similar to when you first start out writing Meteor applications, you may wonder "how do I organize my package code?" Good question! Not to burst your bubble, but very similar to Meteor applications: there's very little convention. In fact, you can get away with _no_ organization strategy if you want and put all of your files in the root directory for your package (e.g. `/packages/grindage`). Let's explore how Grindage has been organized and why.
 
@@ -526,44 +531,245 @@ Again, this may all seem unnecessary and it's certainly not required. The point 
 Before you publish a package, consider spending some time writing JSDoc comments to make your code a little easier to navigate.
 
 ### Writing Tests for Package Code
-- What is a test?
-- Why do we test?
-- How do we test?
-  - What is Tinytest?
-- What should we test?
-- Running tests
+Okay. Deep breaths. Let's talk about tests. Don't worry, it's easier than you think and 100% worth it.
+
+##### What is a test?
+We hear all this talk about "testing" and "test driven development," but what exactly _is_ testing...or more importantly, what is _a test_?
+
+A test is best thought of as a set of instructions that can be run automatically in your application. More specifically, those instructions are hyper-specific; do this one thing and tell me if it works.
+
+Think of it like this: in our Grindage package, we have a function `Grindage()` that's designed to tell us whether or not the food group we've passed (string) to it is valid. We can test this manually, but that takes time and leaves us open to errors as we can miss certain input variations.
+
+Writing a test allows us to automate the process of testing each input variation. Let's take a look at one of our client-side tests for Grindage.
+
+<p class="block-header">/path/to/file</p>
+```.lang-javascript
+Tinytest.add('Does the Grindage function return TRUE for an existing group?', function( test ) {
+  var testGroup = Grindage( 'dairy' );
+  test.equal( testGroup, true );
+});
+```
+
+This is an individual test. Ignore the syntax for a bit (we'll cover that soon) and look at what we're doing inside. Here, we're calling our `Grindage()` function from the client, passing it a food group that we're certain exists. Next, we assign the return value of our function (either `true` or `false`) to a variable called `testGroup`. Lastly, we "verify" that passing `"dairy"` as our value returns _true_. Let's look at the inverse of this, testing with a non-existent food group.
+
+<p class="block-header">/path/to/file</p>
+```.lang-javascript
+Tinytest.add('Does the Grindage function return FALSE for a non-existent group?', function( test ) {
+  var testGroup = Grindage( 'tacos' );
+  test.equal( testGroup, false );
+});
+```
+
+See the difference? This time we pass a value we're certain _does not_ exist and then we verify that passing `"tacos"` (a non-existent value) causes our `Grindage()` function to return `false`.
+
+Together, these two tests form a "suite." A suite is just a group of related tests in your application. The grouping is entirely up to you, but it's best to keep tests that are inspecting the same chunk of code together.
+
+#### Why do we test?
+Great! Testing...yeah. Why are we doing this? A few reasons. The first and foremost is certainty. By writing tests, we can be _more certain_ that our code is functioning how we expect.
+
+Maybe instead of code we work at a fire department and one of our jobs is to test the hoses. It makes sense that we'd want each of our hoses to work and not leak water, right? Same thing here. Although our code may not be putting out fires, it's still important to make sure that it works as expected every single time.
+
+Writing tests, while not foolproof, definitely increase the odds that we can deploy code before we leave work and rest comfortably knowing we didn't charge someone's credit card $1,000,000 overnight.
+
+#### How do we test?
+Okay, so we're convinced we need tests. How do we do it? Fortunately for us, Meteor has written their own testing framework called Tinytest to help us with this.
+
+<div class="note">
+  <h3>A quick note</h3>
+  <p>A testing framework like Tinytest is just a specific syntax and collection of helper functions for testing your code. Think <a href="http://getbootstrap.com">Bootstrap</a> vs. <a href="http://foundation.zurb.com/">Foundation</a>. They both accomplish the same thing, just in different ways.</p>
+</div>
+
+Tinytest is fairly minimal. It has a [simple API](https://github.com/awatson1978/meteor-cookbook/blob/master/cookbook/writing.unit.tests.md#tinytest-api) of 11 methods that we can use to test values. To keep things simple, we'll focus specifically on two of those methods: `test.equal()` and `test.notEqual()`. Let's look at the anatomy of a test.
+
+<p class="block-header">/path/to/file</p>
+```.lang-javascript
+Tinytest.add('Is the grindage template available on the client?', function( test ) {
+  test.notEqual( typeof Template.grindage, "undefined" );
+});
+```
+
+This a very simple test. Here, we're checking to see whether the template we've defined in our package `grindage` is available on the client (meaning our user could add it in their own app like `{{> grindage}}`). The test itself takes two values here: first, the _actual_ value Meteor sees and second, the value we _expect_ Meteor to see.
+
+Pay attention to the wording, though. Because we're using `test.notEqual()` here, we're saying "we expect Template.grindage to not equal undefined." Make sense? If `typeof` does not return `"undefined"` (meaning our test passes), we can be certain our template is available on the client. Neat!
+
+Let's look at another, slightly more complicated test.
+
+<p class="block-header">/path/to/file</p>
+```.lang-javascript
+Tinytest.addAsync('Does the FoodGroups collection have documents on the client?', function( test, next ) {
+  Meteor.subscribe('foodGroups', function() {
+    getGroups = FoodGroups.find().fetch();
+    test.equal( getGroups.length, 4 );
+    next();
+  });
+});
+```
+
+What the fudge is this? Notice that for this test, instead of using `Tinytest.add()` we're using `Tinytest.addAsync()`. What's up with that? This is just another variation of a Tinytest that we can write that allows us to test code that's asynchronous or non-blocking. One of the features of our package is that it publishes a set of "allowed" food groups to the client.
+
+In order to verify that our publication and subscription are working on the client, we need to use an async test because our subscription loads _asynchronously_. This means we need to "wait" until our subscription is ready before performing our test. Confused? Dont' worry, I was (am) too. It's not the clearest concept. Let's step through it.
+
+First, notice that in our test's callback function, we've added an additional argument `next` that points to a function telling Tinytest to "continue" when it's called. Next, we make a call to `Meteor.subscribe('foodGroups')` the publication we've defined in our package. Lastly, we pass a callback function (also known as the "on ready" event) to our subscription.
+
+Inside of that callback is where the actual test is performed. At this point we can be certain our subscription is ready, so we attempt to do a `find()` on our database, fetching it as an array. Our actual test, then, is to verify that the length of that array is `4`. Why 4?
+
+If you take a look at our `lib/startup.js` file within our package, we've setup a function to automatically insert four documents (our "allowed" food groups) when Meteor starts up. Here, we simply test to verify 1.) that our `FoodGroups` collection is accessible on the client and 2.) that it has the data we expect (meaning our startup function worked).
+
+So. That's a quick look at tests. In reality, there's a lot of hiddden complexity to testing. The point is to *not be overwhelmed*. A good rule of thumb is to play around. Take the tests in this package and muck with their expected results. Get them to pass. Get them to fail. This is the only way I've personally found to "get" testing. Don't be discouraged if you don't have some mega-crazy-totally-absurd test suite. Just start slowly and try stuff out. If you write just one test, you're doing well. Keep plugging at it!
+
+![Meteor Testing Manual](https://static-2.gumroad.com/res/gumroad/files/15cc6a58d4d946498d6d3afe950191f3/original/The-Meteor-Testing-Manual.gif)
+
+<div class="note">
+  <h3>A quick note</h3>
+  <p>If you're interested in learning more about testing with Meteor, I recommend checking out Sam Hatoum's book <a href="http://www.meteortesting.com">The Meteor Testing Manual</a>. As a special gift for readers of this recipe, you can <strong>use <a href="https://gumroad.com/l/CjWVEw/ttmc">this code</a> to save 15%</strong> when you buy the book! <strong>This coupon is only good until May 27th, 2015 so act quick.</strong></p>
+</div>
+
+#### What should we test?
+So we've seen how to write a test but how can we know _what_ to test? Ah, right. This is tricky. I've found that asking the question "what code have I written that can break?" is incredibly helpful. Even more, think about this on a very granular, small level. A test ideally looks at one thing. Notice in our examples we had one test just for testing if the template was visible. Another for testing if our function worked. That's the idea: start small.
+
+What will really cook your melon is that there are different kinds of tests. That's outside of the scope of this recipe, but what we're covering here is known as a "unit" test. Like it sounds, unit tests are designed to test individual _units_ of code. A single function. Making sure a template exists. Little stuff. Use your best judgment and test the stuff that _could_ break, even if you think your code is perfect.
+
+There's a lot of hullabaloo from the other nerds out there that you need to have a bunch of tests. Much like anything else in web development: it depends. Again, don't be overwhelmed. Start with something small like unit tests and work your way up to the other stuff.
+
+#### Running tests
+Alright...we've written tests. Now we have to actually run them. Run them? Yeah.
+
+Running tests is the automated part of this. It's also where all of this comes together and starts to make a little more sense. Remember earlier when we setup our `Package.onTest()` block? When we say "run our tests," Meteor will be looking at that block to know what to do.
+
+First, we need to make sure that we have Tinytest installed. When we're developing packages, it's best to have our package added to a test app. Let's add Tinytest to that app quick.
+
+<p class="block-header">/path/to/file</p>
+```.lang-bash
+meteor add tinytest
+```
+
+Cool? Okay. The next step is to run the tests. If you have a server running, go ahead and `CTRL + C` to stop it in your terminal. Next, run:
+
+<p class="block-header">Terminal</p>
+```.lang-bash
+meteor test-packages packages/themeteorchef:grindage
+```
+
+Running `meteor test-packages` like this allows us to run _only_ the tests for our package. If we run `meteor test-packages` by itself, Meteor will run all of the tests it finds in our project (meaning if another package has tests, we'd see those too). Running the tests, you should see something like this in your browser at `http://localhost:3000`:
+
+![Tests Passing](http://cl.ly/image/3X34361j342v/Image%202015-05-13%20at%2010.26.21%20AM.png)
+
+Awesome! Here we can see all of our tests passing. A fun experiment to try here is to open up the tests while this is running and attempt to break them. For example, if we change the first test in our `/tests/client/client-tests.js` file to read like this:
+
+<p class="block-header">/path/to/file</p>
+```.lang-javascript
+Tinytest.add('Is the grindage template available on the client?', function( test ) {
+  test.equal( typeof Template.grindage, "tacos" );
+  [...]
+});
+```
+
+We get a result like this:
+
+![Failing Test](http://cl.ly/image/3Y2b343k2q2e/Image%202015-05-13%20at%2010.29.04%20AM.png)
+
+Pretty handy. As you can see, we're trying to get all green tests. If we get a `FAIL`, that means we need to check our code to see that it's performing as expected.
+
+#### Do I have to test?
+Good question! If you want to consider your work professional: yes. Testing is a necessary evil that actually becomes quite fun once you get the hang of it. It challenges you to write better code that's more performant. It also helps you sleep like a baby at night. If you've ever shipped a codebase untested, you've definitely had night terrors of bugs causing a ruckus in production.
+
+Be smart. Be safe. Test yout stuff.
 
 ### Writing a README
-- Defining what the package is for.
-- Explaining the API.
-- Outlining Tests and Running Tests
-- Providing a License
+Pretty great stuff, right? At this point we have a functioning, tested package that we're ready to release. But wait! There's a very important step that we need to complete: documentation. Seriously?!
+
+Yes. If you've ever attempted to use a package (or any code for that matter) that had little to no documentation, you've probably lost your mind in the process. Writing documentation is super important as it helps your fellow developers understand how to actually _use_ your package. Seems obvious, right? So how do we do it and what do we include? A few guidelines:
+
+1. Define the package. What does it do? Who is it for? What problem does it help to solve? Provide examples here. Give me an example of what my code will look like when I use your package.
+2. Explain the API. What are the public functions/methods? How do they work? What parameters do they take and what types? This is where you explain what Lego parts are in the bin so we know what we can build with.
+3. Outline your tests and how to run them. Make sure people using your package know how to test it. My personal favorite is to include instructions for running the test along with a screenshot of the tests passing.
+4. Provide a license. This is mostly important for businesses and developers within corporations. A license lets developers know what restrictions you've placed on your code and how they can use it.
+
+Don't skimp on your README. If you want/expect developers to use your package, look at your README as the number one way to communicate its value. This is the marketing site for your package. Give it a little T.L.C.
 
 ### Versioning Your Package
-- Using Semvers
-- Updating Package.js
-- Tagging on GitHub
+We're almost there! The last thing we need to talk about before we release our package is versioning. This is **super important**. Versioning is how we tell Meteor (and other developers) when our code was last updated and how. In order to do this, we use something called semantic versioning.
+
+#### Using Semantic Versioning
+Semantic versioning implies a three number version scheme: `<major>.<minor>.<bug>`. Here's what this means:
+
+> Given a version number MAJOR.MINOR.PATCH, increment the:
+>
+>
+> MAJOR version when you make incompatible API changes,
+>
+>
+> MINOR version when you add functionality in a backwards-compatible manner, and
+>
+>
+> PATCH version when you make backwards-compatible bug fixes.
+
+So, we can start our package at something like `1.0.0` when we release it and update from there. For example, say we release `1.0.0` but we find a bug. Once we've fixed that bug, we'd bump the version to `1.0.1`. Another example could be we add some functionality that works with the existing code (backwards compatible), so we bump it to `1.1.0`. Notice that for each "tier," we reset to `0`. It's important to note that each version should be "frozen." This means that once you've released something at `1.5.0`, the code cannot change without a version bump. So if we were to fix a bug in `1.5.0`, we _must_ bump it to `1.5.1`.
+
+#### Updating Package.js
+Whenever we write a new version of our package (again, to fix a bug or add functionality), we need to make note of our version number in our `package.js` file. This is mandatory. If we change our code and go to publish it without changing the `version` field in our `Package.describe()` block, Meteor will throw a hissy fit.
+
+#### Tagging on GitHub
+I can't stress this enough. It's super important to _tag your releases on GitHub_. Tagging is the act of "marking" a batch of code as a release. For example, say my code is at `1.8.0` and I make some major changes bumping it to `2.0.0`. When I push the changes that make the code `2.0.0` (e.g. we'll say five commits), I can "tag" that point in time as a release. Tagging is done directly from Git using the command `git tag -a <version>`.
+
+In our case, once we've commited some code to master and pushed it, assuming we're at version `2.0.0` we'd tag it by doing:
+
+<p class="block-header">/path/to/file</p>
+```.lang-bash
+# Step One
+git tag -a 2.0.0
+# Step Two
+git push origin 2.0.0
+```
+
+That's it. Tagging doesn't mess with your code, it's purely semantic. The point is to create a snapshot for a batch of code to say "okay, this is where the code was at for version 2.0.0." Each time we release, we add a new tag and push it.
+
+<div class="note">
+  <h3>A quick note</h3>
+  <p>This process can get a bit daunting. I prefer to use the library <a href="https://github.com/tj/git-extras">Git Extras</a> to simplify everything. Instead of the above, using Git Extras we could do `git release 2.0.0` and it will automatically push our code to origin/master, create a 2.0.0 tag, and push that tag to our repository. Awesome!</p>
+</div>
+
+Once you've pushed your tags to GitHub, you'll be able to see them (and click on them to view each version) like this:
+
+![Base Tags](http://cl.ly/image/2B0S1z0j2j2b/Image%202015-05-13%20at%2011.19.08%20AM.png)
 
 ### Releasing Your Package
-- Releasing a New Package
-- Releasing an Update to an Existing Package
+Finally! It's time to release our package into the wild. At this point, we've got our code up on GitHub, it's tagged, our `package.js` has its `version` set to `1.0.0` and we're ready to go live. This is...underwhelming (which is a good thing). To release our package (making it accessible on Atmosphere and to developers) we do:
+
+<p class="block-header">/path/to/file</p>
+```.lang-bash
+  meteor publish --create
+```
+
+That's it! Meteor will do the rest. Note that here we've added the `--create` flag as this is the _first time_ we're publishing this package. On each subsequent version, we'd just do:
+
+<p class="block-header">/path/to/file</p>
+```.lang-bash
+  meteor publish
+```
+
+Super simple. Congratulations! You've just released a package. Now the real work begins.
 
 ### Maintaining Your Package
-When it comes to maintaining your package (keeping it up to date, fixing bugs, etc), it's important to develop some sort of process. After you've shipped your first version, it's guaranteed that it will have some bugs, areas for improvement, and pick up feature suggestions from the community. How do we go about maintaing our package?
+Silly you. You didn't think we'd just stop with releasing, did you? No. Before we part ways, we need to talk about _maintaining_ our package. Fixing bugs, adding functionality, and responding to other developers questions and requests. It's actually a lot of fun.
 
 #### GitHub Issues
-This is the simplest and most effective way (I've found) to manage your package code. If you've never tried them out, [GitHub Issues]() allow you to create chronological "todo lists" tied directly to your code. For example, you can add a new issue and label it as a "bug." If you have a new idea for a feature, you can label it as "feature." GitHub imposes no naming conventions, so you can call your labels whatever you'd like.
-
-In addition to being able to add issues yourself, GitHub also allows other people to submit issues, too. This is handy as it allows developers who bump into bugs or come up with feature ideas to easily submit new ideas. **When it comes to issues: respond**.
-
-If even to just sort or organize an issue into some label, make sure you do it. This makes it easy for other developers to trust your package and even dedicate time to helping you maintaing it. It's also common courtosey. The people installing your package are likely using it in their day-to-day work and nothing is more frustrating than seeing your issue (whether its valid or not) being ignored.
+The first thing you'll want to do is familiarize yourself with GitHub's issues feature. It's a simple issue tracker built right into each of your repositories. This makes it easy for other developers (yourself, too) to jot down issues related to your code. Issues are not just "problems," they can also be feature requests, questions, or things you'd like to refactor. GitHub places no restriction on the type of labels you can apply to issues, so go nuts and have a `gnarly` label if you'd like.
 
 #### Responding to Issues
-Beyond just responding to issues, how you respond is important, too. When you respond, try to get as much information as you can about the bug or feature request. It's helpful to ask for things like a demo link or a [Gist]() to help you debug. It's perfectly okay to say "I don't know," but work to figure out what the issue is and help the other developer to resolve the problem. Be polite, too. Someone has given enough damns to use your package. Even if they're a little salty, help them out.
+As a published package developer, you now hold the responsibility of keeping up with your code. No (sane) person is expecting you to update your code constantly, but as a cortousey to your fellow developers, it's good practice to respond to issues dilligently. This requires a bit of self-composure. Developers are known for being a feisty bunch and can sometimes leave not-so-friendly comments on your code. Don't take it personally.
+
+The goal with any issues that are submitted for your code is to understand what problem (or idea) they have, whether or not it can be fixed, and work with them to solve it. Again, this is the real world. You have to take your cat to its circus training class and we all gotta munch on some grindage. You don't have to respond _instantly_, but make sure to follow up on stuff. Remember: people opening issues on your code is a sign that they want to use it and they like. Keeping up a good report with these folks helps to give your package momentum and encourage usage.
 
 #### Testing Issues
-Fixing code isn't enough. You also need to _test your fixes_ to confirm that they work. This should be common sense, but when a bug is reported a good practice is to open up a new branch on your package's repo and perform the fix. Run your Meteor server to confirm the bug _and_ the fix. Once you're certain a bug is fixed, close out the branch and merge it with master (following the versioning steps above).
-
-Once a fix is merged, deploy it to the GitHub repo with a tag and then publish the update to Meteor using the `meteor publish` command.
+Lastly, it's important to note that you need to carefully test issues. Following our pattern from above, if a bug is reported, take it seriously. Open up your repo locally, create a new branch, and attempt to recreate the bug. Once you do, work to fix it and then _test your fix_. No matter how small, it's important to confirm that any unwanted behavior is corrected _before_ you release an update. Once you're certain that the fix is working, follow the versioning and release steps above.
 
 #### Updating Code
+Fixing bugs, adding features, and anything else related to changing your code can be bundled up as "updating code." When we do, we need to follow a process to make sure we're shipping top notch packages. Here's an example workflow to guide your thinking:
+
+![Development Workflow](http://cl.ly/image/2z3k2F36133x/Image%202015-05-13%20at%2011.36.58%20AM.png)
+
+### Wrap Up & Summary
+Boom! It was a long road, but we now have a complete understanding of how to develop, test, and release packages! We even learned how to maintain our package so other developers are encouraged to use and contribute to our package.
+
+You now hold an immense amount of power in your hands. Go forth and conquer! Make sure to share any packages you come up with in the comments :)
