@@ -12,7 +12,7 @@ Package.onUse(function(api) {
   // Dependencies
   // Packages that our package is dependent on to work.
   api.use(["templating", "underscore"]);
-  api.use(["iron:router@1.0.7"], 'client', {weak: false, unordered: false});
+  api.use(["iron:router"], 'client', {weak: false, unordered: false});
   api.use(["themeteorchef:controller"], 'client');
 
   // Package Files

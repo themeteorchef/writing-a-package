@@ -15,7 +15,7 @@
 
 checkUserLoggedIn = function(){
   if( !Meteor.loggingIn() && !Meteor.user() ) {
-    Router.go('/login');
+    Router.go('/grindage');
   } else {
     this.next();
   }
@@ -29,7 +29,7 @@ checkUserLoggedIn = function(){
 
 userAuthenticated = function(){
   if( !Meteor.loggingIn() && Meteor.user() ){
-    Router.go('/');
+    Router.go('/grindage');
   } else {
     this.next();
   }

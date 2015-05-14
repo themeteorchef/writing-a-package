@@ -1,13 +1,13 @@
 #### The Meteor Chef
-#### \#<sequence number> - <Recipe Name>
+#### \#007 - Writing a Package
 
-<What we'll learn description>
+In this recipe, we'll learn how to write a package. We'll take a look at setting up a package.js file, writing and organizing your code, and preparing tests. We'll even learn how to document our package and maintain it after release!
 
 
-[Read on The Meteor Chef](http://themeteorchef.com/recipes/<recipe-slug>)  
+[Read on The Meteor Chef](http://themeteorchef.com/recipes/writing-a-package)  
 
-[Demo the Recipe](http://tmc-<sequence-number>-demo.meteor.com)  
+[Demo the Recipe](http://tmc-007-demo.meteor.com)  
 
-[Download the Source](https://github.com/themeteorchef/<repository-slug>/archive/master.zip)
+[Download the Source](https://github.com/themeteorchef/writing-a-package/archive/master.zip)
 
 The code for this recipe is licensed under the [MIT License](http://opensource.org/licenses/MIT).

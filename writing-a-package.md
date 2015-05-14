@@ -3,10 +3,10 @@ Because the focus of this recipe is on writing a package, we won't be adding too
 
 <p class="block-header">Terminal</p>
 ```.lang-bash
-  meteor add tinytest
+meteor add tinytest
 ```
 
-Tinytest is a testing framework written by the Meteor Development Group. It's a minimalist solution to testing that makes it easy to test our packages. It's easy to pick up, so it's a great way to dip your toes into the testing pool.
+Tinytest is a testing framework written by the [Meteor Development Group](https://www.meteor.com/people). It's a minimalist solution to testing that makes it easy to test our packages. It's easy to pick up, so it's a great way to dip your toes into the testing pool.
 
 ### Local Packages
 In order to develop packages locally, we need to do a little bit of configuration on our machine. By default, when we use the `meteor add <package-name>` command, Meteor just jumps up to the package server at `packages.meteor.com` and searches for your package.
@@ -14,27 +14,27 @@ In order to develop packages locally, we need to do a little bit of configuratio
 In order to work with our local package code, we need to override this by setting a global environment variable called `PACKAGE_DIRS` in our shell:
 
 > Global variables or environment variables are available in all shells.
-
-- [Bash Guide for Beginners](http://tldp.org/LDP/Bash-Beginners-Guide/html/sect_03_02.html)
+>
+> — [Bash Guide for Beginners](http://tldp.org/LDP/Bash-Beginners-Guide/html/sect_03_02.html)
 
 Just like it sounds, `PACKAGE_DIRS` is meant to point to a directory containing all of your local packages. This means that in terms of organization, it's best to have one directory on your computer _just for your Meteor packages_. Note: this doesn't mean packages you install from third-party authors, but rather, packages that you write and release yourself.
 
-In order to set `PACKAGE_DIRS`, you need to export it to your shell. Let's look at two ways to do this (one is using the more common Bash shell environment, and the other using Zsh, a popular alternative to Bash).
+In order to set `PACKAGE_DIRS`, you need to export it to your shell. Let's look at two ways to do this (one is using the more common [Bash](http://www.gnu.org/software/bash/) shell environment, and the other using [Zsh (Z shell)](http://zsh.sourceforge.net/), a popular alternative to Bash).
 
 For Bash, add the following to the end of your `~/.bash_profile`:
 
 <p class="block-header">~/.bash_profile</p>
 ```.lang-bash
-  # Define PACKAGE_DIRS for Local Meteor Packages
-  export PACKAGE_DIRS="$HOME/path/to/packages"
+# Define PACKAGE_DIRS for Local Meteor Packages
+export PACKAGE_DIRS="$HOME/path/to/packages"
 ```
 
 Here, `/path/to/packages` is quite literally the folder path to where you keep your packages. A good example of this could be `/projects/meteor/packages`. The `$HOME` prefix here simply points the start of the path to your home directory, or, `~`.
 
 <p class="block-header">~/.zprofile</p>
 ```.lang-bash
-  # Define PACKAGE_DIRS for Local Meteor Packages
-  export PACKAGE_DIRS="$HOME/path/to/packages"
+# Define PACKAGE_DIRS for Local Meteor Packages
+export PACKAGE_DIRS="$HOME/path/to/packages"
 ```
 
 Same thing for Zsh, but note that the profile is located in `~/.zprofile` instead of `~/.bash_profile`.
@@ -48,24 +48,23 @@ Lastly, we need to tell our Meteor app about our package. In order to do this, f
 
 <p class="block-header">Terminal</p>
 ```.lang-bash
-  meteor add author:package-name
+meteor add author:package-name
 ```
 
 If we've done everything correctly, we should see the package install and upon running `meteor list`, see our package listed, with a `+` symbol after it's version (as a note at the bottom of the list will explain, this denotes packages that are built locally from source).
 
-![Example package list with local packages](http://cl.ly/auWn/Image%202015-05-08%20at%2011.04.51%20AM.png)
+![Example package list with local packages](http://cl.ly/axvT/Image%202015-05-14%20at%208.30.33%20AM.png)
 
 In order to build the package for this recipe, we'll be doing something a little different than this, but this is all good to know and configure up front before you become _Packagetron 5000: Master of Packages_.
 
 ### Responsible Package Development
 Before we dive in to writing our package for this recipe, it's important to give a hat tip to the notion of responsible package development. Because literally _anyone_ can create a package for Meteor, it's incredibly easy to pollute the package directory with duplicate packages.
 
-Namely, this mostly applies to creating packages that are simple wrappers around existing libraries (e.g. that totally rad jQuery animation plugin you love). The best of rule of thumb is: search first. If your wrapping existing code, make sure somebody hasn't already done so (and is actively maintaing it).
+Namely, this mostly applies to creating packages that are simple wrappers around existing libraries (e.g. that totally rad jQuery animation plugin you love). The best rule of thumb is: [search first](https://atmospherejs.com/?q=). If you're wrapping existing code, make sure somebody hasn't already done so (and is actively maintaing it).
 
-[Dan Dascalescu](https://twitter.com/dandv) gave [a lightning talk](https://www.youtube.com/watch?v=g-idz8UPtDM) at the December 2014 Devshop meetup about this that's worth its 6 minute runtime:
+[Dan Dascalescu](https://twitter.com/dandv) gave [a lightning talk](https://www.youtube.com/watch?v=g-idz8UPtDM) at the December 2014 Devshop meetup about this that's worth its ~6 minute runtime:
 
 <iframe width="560" height="315" src="https://www.youtube.com/embed/g-idz8UPtDM" frameborder="0" allowfullscreen></iframe>
-
 
 ### Grindage
 If you were a child of the 90's like myself, it's likely that you found yourself giggling at a [Pauly Shore](http://en.wikipedia.org/wiki/Pauly_Shore) movie or two growing up. Before we dig in, let us bow our heads in awe of how a character like Pauly Shore could only have existed in the 90s and _no other time_. Ohm.
@@ -74,7 +73,7 @@ Okay! Grindage. What the hell is that? Let's pause for a second to review:
 
 <iframe width="420" height="315" src="https://www.youtube.com/embed/h1hEKqZz-OY" frameborder="0" allowfullscreen></iframe>
 
-Got it? Great. So we have four basic food groups. In order to ensure that our nutrition (and our fellow Meteor developers) is up to snuff, we're going to write a package that tests whether or not a given food group is legit. To get started, make sure you've setup a fresh Meteor project and have added a `/packages` directory to the root.
+Got it? Great. So we have four basic food groups. In order to ensure that our (and our fellow Meteor developers) nutrition is up to snuff, we're going to write a package that tests whether or not a given food group is legit. To get started, make sure you've setup a fresh Meteor project and have added a `/packages` directory to the root.
 
 <div class="note">
   <h3>A quick note</h3>
@@ -85,16 +84,16 @@ Next, we need to create our package. We can do this manually, or, we can be smar
 
 <p class="block-header">Terminal</p>
 ```.lang-bash
-  meteor create --package author:package-name
+meteor create --package author:package-name
 ```
 
-**Note**: you will want to replace `author` and `package-name` above with your own details. For this recipe, you can do something like `<your-meteor-username>:grindage`, or `personflerson:grindage`. In the [recipe source](https://github.com/themeteorchef/writing-a-package) we've already set this up as `themeteorchef:grindage`.
+**Note**: you will want to replace `author` and `package-name` above with your own details. For this recipe, you can do something like `<your-meteor-username>:grindage`, or `meteordeveloper:grindage`. In the [recipe source](https://github.com/themeteorchef/writing-a-package) we've already set this up as `themeteorchef:grindage`.
 
-Cool! This should have added a new directory to your `/packages` directory called `grindage`. This will also populate the directory with some boilerplate to help us get our package setup a little quicker. Neat!
+Cool! This should have added a new directory to your `/packages` directory called `grindage`. This will also populate the directory with some boilerplate to help us get our package setup a little quicker. [Yeah, budddy](http://media.giphy.com/media/m3ltNrOXZh0ti/giphy.gif)!
 
 <div class="note">
   <h3>A quick note</h3>
-  <p>In order to guide you in the package writing process, I'd recommend check out a little tool by my buddy Dean Radcliffe (<a href="http://twitter.com/chicagogrooves">@chicagogrooves</a>) called <a href="http://package-kitchen.meteor.com">Package Kitchen</a>. It's super handy for spinning up new packages. Check it out!</p>
+  <p>In order to guide you in the package writing process, I'd recommend checking out a little tool by my buddy Dean Radcliffe (<a href="http://twitter.com/chicagogrooves">@chicagogrooves</a>) called <a href="http://package-kitchen.meteor.com">Package Kitchen</a>. It's super handy for spinning up new packages. Check it out!</p>
 </div>
 
 But wait, what's up with the colon convention in the demo?
@@ -105,30 +104,31 @@ Okay, budddy. Onward!
 
 ### Package.js
 
-Alright, so we've got our package template setup. Before we dive into actually writing the code for our package, we're going to walk through the various APIs that Meteor gives us access to for _writing_ our package. This part is a bit winded, so feel free to skip around to the relevant parts or jump down to the meaty stuff.
+Alright, so we've got our package template setup. Before we dive into actually writing the code for our package, we're going to walk through the various APIs that Meteor gives us access to for writing our `package.js` file. The `package.js` file is what Meteor uses to identify our package as well as load its dependencies, files, and tests.
 
-The first thing we want to do is open up our `package.js` file inside of our freshly minted directory. First up, let's talk about the `Package.describe` block and how it works.
+The first thing we want to do is open up our `package.js` file inside of our freshly minted `/packages/grindage` directory. First up, let's talk about the `Package.describe` block and how it works.
 
 #### Package.describe
-The describe block in your `package.js` file does exactly what it says: describes your package. More specifically, this is the information that Meteor uses to register the package with the Meteor package system. It contains the name of the package, a summary of what the package does, a version number, and a GitHub repository link.
+The describe block in your `package.js` file does exactly what it says: describes your package. More specifically, this is the information that Meteor uses to register the package with the Meteor package system. It contains the name of the package, a summary of what the package does, a version number, a Git repository link, and the path to the package's documentation (relative to the package directory).
 
 <p class="block-header">/packages/grindage/package.js</p>
 ```.lang-javascript
 Package.describe({
-  name: "<author>:grindage",
-  summary: "Learn the four basic food groups, buddddddy.",
+  name: "themeteorchef:grindage",
+  summary: "A tool for checking whether Stoney thinks our food group is legit.",
   version: "1.0.0",
-  git: "https://github.com/<author>/grindage"
+  git: "https://github.com/themeteorchef/grindage",
+  documentation: "README.md"
 });
 ```
 
 Pretty self-explanatory. A few things to point out, though.
 
 ##### Name
-Notice that the name field here is the _full name_ of the package as a user would add it in their terminal. In this example, we've replaced the author name with `<author>` but ultimately this would look something like `themeteorchef:grindage`. Setting this field is optional as Meteor automatically pulls the name based on the directory. This can be a bit confusing, though, so it's good practice to set it anyways.
+Notice that the name field here is the _full name_ of the package as a user would add it in their terminal. Again, the syntax here is `<author-name>:<package-name>`. Setting this field is optional as Meteor automatically pulls the name based on the directory, but this can be a bit confusing so it's good practice to set it anyways.
 
 ##### Summary
-For the summary, the name of the game is: keep it short. This should be one sentence (two if you _must_) that says what the package does. Another example of this could be "Adds support for the Bootstrap CSS framework." Short and simple. Keep in mind, you'll have an opportunity to elaborate on your package and how it works when we discuss writing a README.md later on.
+For the summary, the name of the game is: keep it short. This should be one sentence (two if you _must_) that says what the package does. Another example of this could be "Adds support for the Bootstrap CSS framework." Short and simple. Keep in mind, you'll have an opportunity to elaborate on your package and how it works when we discuss writing a README later on.
 
 ##### Version
 Versioning your package is essential, as it's how Meteor knows to share new releases of your package with users. We'll discuss versioning your package in detail later, but it's important to know that whenever you make a change to your package, you will need to change this number before you publish the release.
@@ -142,7 +142,7 @@ Lastly, we have the documentation field. This accepts a single string pointing t
 Making sure these fields exist in your `Package.describe` block is helpful to other developers looking at your code. Even if they're not 100% required, if your goal is to share with others, make sure they're filled out properly.
 
 #### Package.onUse
-The next—and most important—block of our `package.js` file is the Package.onUse section. This section is where we define the dependencies, files, and exports for our package. Without this, our package won't work. Let's take a peak at each of the methods we'll use inside of this block and how they work.
+The next—and most important—block of our `package.js` file is the `Package.onUse` section. This section is where we define the dependencies, files, and exports for our package. Without this, our package won't work. Let's take a peak at each of the methods we'll use inside of this block and how they work.
 
 <div class="note">
   <h3>A quick note</h3>
@@ -152,7 +152,7 @@ The next—and most important—block of our `package.js` file is the Package.on
 The first thing to point out is that within our block, Meteor passes an `api` argument that we can use. The `api` variable contains all of the methods that we'll need to define dependencies, files, and exports for our package.
 
 ##### api.versionsFrom
-<p class="block-header">/path/to/file</p>
+<p class="block-header">/packages/grindage/package.js</p>
 ```.lang-javascript
 Package.onUse(function(api) {
   api.versionsFrom("1.0.1");
@@ -166,65 +166,66 @@ At the very top of our `Package.onUse` block is a one-liner `api.versionsFrom()`
 >
 > — [Meteor Documentation](http://docs.meteor.com/#/full/pack_versions)
 
-Note: this doesn't automatically include the core packages as dependencies, but rather, acts as a quick reference for those packages to check if and when they're added.
+Note: this doesn't automatically include the core packages as dependencies, but rather, acts as a quick reference for those packages to check what version to use if and when they're added.
 
 ##### api.use
-Next up is the `.use()` method which is responsible for defining external package dependencies for our own package. You can have as many `api.use()` calls as you want. `.use()` calls can be defined to load a single file, or, an array of files. An `api.use()` call can accept a few arguments `api.use(<package(s)>, <architecture>, <options>)`:
+Next up is the `.use()` method which is responsible for defining external package dependencies for our own package. You can have as many `api.use()` calls as you want. `.use()` calls can be defined to load a single dependency, or, an array of dependencies. An `api.use()` call can accept a few arguments `api.use(<package(s)>, <architecture(s)>, <options>)`:
 
 - `package(s)`: either a single string or array of strings of packages that should be depended on. The array convention can be used to group together package dependencies that will be loaded using the same architecture and/or options.
-- `architecture`: where in the application the package and its exports should be made available. This can be set to `client`, `server`, `web.browser`, or `web.cordova`.
+- `architecture`: where in the application the package and its exports should be made available. This can be set to `client`, `server`, `web.browser`, or `web.cordova` or an array combining any of these.
 - `options`: An object containing two settings (explained below), `weak` and unordered.
 
 Let's take a look at our Grindage package to see a few different versions of using `api.use()`.
 
-<p class="block-header">/path/to/file</p>
+<p class="block-header">/packages/grindage/package.js</p>
 ```.lang-javascript
 Package.onUse(function(api) {
   [...]
 
   api.use(["templating", "underscore"]);
-  api.use(["iron:router@1.0.7"], 'client', {weak: false, unordered: false});
+  api.use(["iron:router"], 'client', {weak: false, unordered: false});
   api.use(["themeteorchef:controller"], 'client');
 
   [...]
 });
 ```
 
-Here, we've broken up our `.use()` calls into three separate blocks. Let's step through each one.
+Here, we've broken up our `.use()` calls into three separate blocks. Let's step through the first two which show off the different ways to load depedencies for our package.
 
-##### Core dependencies
+##### Core Dependencies
 The first block `api.use(["templating", "underscore"]);` is us loading in _core_ dependencies. These are the packages that ship with Meteor. Placing this block here is by no means required, but a nice starting layer to help you separate Meteor packages vs. third-party/user packages.
 
 Essentially, when you're writing a package for Meteor you should assume that you're working with a blank sheet. This means that if your package needs to use templates, you will have to tell Meteor that the package needs access to the `templating` package from core. The same applies to _any_ external package code, core or otherwise. Okay...how do I know which core packages to load in?
 
-This is kind of tricky. Your first question might be "what _are_ the core packages?" To which I'd laugh and say, "pull up a chair and let's browse GitHub." At the moment, the best resource for knowing what the core packages are is to browse the [Meteor GitHub repository](https://github.com/meteor/meteor/tree/devel/packages). Here, you'll find the entire list of packages baked into core. Where this gets a little difficult is deducting _which_ packages are required for _which_ functionality. This, admittedly, require some tinkering. Some stuff is obvious. We use templates in our package so we need the `templating` package. The same with `underscore`.
+This is kind of tricky. Your first question might be "what _are_ the core packages?" To which I'd laugh and say, "pull up a chair and let's browse GitHub." At the moment, the best resource for knowing what the core packages are is to browse the [Meteor GitHub repository](https://github.com/meteor/meteor/tree/devel/packages).
 
-The name of the game for now is to get comfortable browsing the source of the core packages. What's interesting about this is that some core packages, like `templating`, have their _own_ dependencies. Which means in some cases, you only need to load one package as it will automatically pull in the others for you. A bit of wisdom if you're just getting started: don't let this process frustrate you. It _is_ a bit tedious at first, but you pick it up pretty quickly. It can even be fun picking apart each of the core package to learn how they work and what they depend on under the hood. Don't give up! Just pop open the [packages directory](https://github.com/meteor/meteor/tree/devel/packages) and when in doubt read the `package.js` file for the packages that sound like what you need.
+Here, you'll find the entire list of packages baked into core. Where this gets a little difficult is deducting _which_ packages are required for _which_ functionality. This, admittedly, requires some tinkering. Some stuff is obvious. We use templates in our package so we need the `templating` package. The same with `underscore`.
 
-##### External dependency w/ version and options
-This one tripped me up. One of the things to keep in mind when working with Meteor packages is that when specifying a dependency, Meteor will always attempt to add the latest version of that package to your app. One of our dependencies, Iron Router, has a funky version history.
+The name of the game for now is to get comfortable browsing the source of the core packages. What's interesting about this is that some core packages, like `templating`, have their _own_ dependencies. Which means in some cases, you only need to load one package as it will automatically pull in the others for you.
 
-In order to get it working, notice that we have to "pin" it to a specific version `"iron:router@1.0.7"`. This tells Meteor that we want to load this package as a dependency _at this specific version_. Without it, Meteor's version solver will attempt to load what it thinks is the latest version (in the case of Iron Router, ADD THE VERSION HERE).'
+A bit of wisdom if you're just getting started: don't let this process frustrate you. It _is_ a bit tedious at first, but you pick it up pretty quickly. It can even be fun picking apart each of the core packages to learn how they work and what they depend on under the hood. Don't give up! Just pop open the [packages directory](https://github.com/meteor/meteor/tree/devel/packages) and when in doubt read the `package.js` file for the packages that sound like what you need.
 
-**Note: this does not apply to all packages.** Only in cases where the version history has been fudged will you need to do this. Generally speaking, packages where this is an issue have documented in their README file. If you run into a snag where a package isn't working after being set as a dependency: start there.
+##### Third-Party Dependency w/ Options
+Just beneath our core dependencies, we're loading in a third-party dependency for the `iron:router` package `api.use(["iron:router"], 'client', {weak: false, unordered: false});`. Here, instead of just passing a string (or array of strings) for dependencies, we're also setting the `architecture` parameter and the `options` parameter.
 
-Lastly, you'll notice a few other things being passed to the `api.use()` call. Here, we're also passing where we want the dependency to be loaded `client` and an object with some parameters: `weak` and `unordered`. What are these?
+The `architecture` parameter here simply denotes _where_ that dependencies code should be loaded. Again, this could be `client`, `server`, `web.browser`, `web.cordova`, or an array like `['client', 'server', 'web.cordova']`.
+
+Lastly, we're also passing an object with some parameters: `weak` and `unordered`. What are these?
 
 The `weak` setting takes a boolean value that tells Meteor whether or not the package _must_ be included in the app. This is sort of confusing. From the docs:
 
 > Establish a weak dependency on a package. If package A has a weak dependency on package B, it means that including A in an app does not force B to be included too — but, if B is included or by another package, then B will load before A.
 
-Essentially, if this is set to `true`, Meteor will not bother including the package. Off-hand, this seems to be useful when you know that the package you're adding will be available for certain in the host application. Because we're writing a package for the public where this is an uncertain, we set it to `false` to ensure Iron Router is included if it's not already present.
+Essentially, if this is set to `true`, Meteor will not bother including the package. Off-hand, this seems to be useful when you know that the package you're adding will be available for certain in the host application. Because we're writing a package for the public where this is an uncertainty, we set it to `false` to ensure `iron:router` is included if it's not already present.
 
 Lastly, we have a field called `unordered`, also set to `false`. This value simply tells Meteor whether it's okay to load the dependency _after_ your package code. In the case of Grindage this is _not_ okay, so we set it to false.
 
 By default, both `weak` and `unordered` are set to false, so you _do not_ need to pass this object like we have here. Only if one (or both) of these parameters will be set to `true` do you need to pass it.  
 
-##### External dependencies by location
-We technically covered this in the previous example, but it's worth pointing out on its own. Here, we're passing a single string to tell Meteor where this dependency should be loaded. In the case of Grindage, we only need it on the client. However, we can just as easily switch this to be `'server'`, or, pass both `client` and `server` as an array like `api.use(['themeteorchef:controller'], ['client', 'server'])`.
-
 #### api.imply
-So, `api.use()` lets us load dependencies for our own package, but Meteor also gives us another method `api.imply()`. What does this do? This method is responsible for making the code (specifically, the exported symbols/variables) from packages we depend on accessible to our host app. For example, say that our package depends on a package called `themeteorchef:tacos`. That packages, `tacos`, exports a symbol `EatTacos` that we need to make use of within our package. Ideally, though, we also want the user who installs our package to have access to the `EatTacos` symbol. Using `api.imply()`, we can do this.
+So, `api.use()` lets us load dependencies for our own package, but Meteor also gives us another method `api.imply()`. What does this do? This method is responsible for making the code (specifically, the exported symbols/variables) from packages we depend on accessible to our host app.
+
+For example, say that our package depends on a package called `themeteorchef:tacos`. That packages, `tacos`, exports a symbol `EatTacos` that we need to make use of within our package. Ideally, though, we also want the user who installs our package to have access to the `EatTacos` symbol. Using `api.imply()`, we can do this.
 
 <div class="note">
   <h3>A quick note</h3>
@@ -232,9 +233,11 @@ So, `api.use()` lets us load dependencies for our own package, but Meteor also g
 </div>
 
 #### api.addFiles
-The big show! `api.addFiles()` does exactly what you think: adds the files for your package. More specifically, this adds the code _you've written_ for your package to the package. This is important. Unlike a normal Meteor app, if you don't add files using the `.addFiles()` method, they might as well not exist. The reason Meteor does this like this is that it allows us to specify a _load order_. So, if one file has a function that a later file needs, we can load that one _first_ to make sure it's ready before the other one. Simple! Let's look at Grindage to see how we're doing this:
+The big show! `api.addFiles()` does exactly what you think: adds the files for your package. More specifically, this adds the code _you've written_ to the package. This is important. Unlike a normal Meteor app, if you don't add files using the `.addFiles()` method, they might as well not exist.
 
-<p class="block-header">/path/to/file</p>
+The reason Meteor does this like this is that it allows us to specify a _load order_. So, if one file has a function that a later file needs, we can load that one _first_ to make sure it's ready before the other one. Simple! Let's look at Grindage to see how we're doing this:
+
+<p class="block-header">/packages/grindage/package.js</p>
 ```.lang-javascript
 Package.onUse(function(api) {
   [...]
@@ -266,14 +269,14 @@ Just like with `.use()` we can pass a single string for both the file and the ar
 
 Hopefully what we're loading is pretty clear, but let's talk through it. The first block is defining a collection for us on both the client and the server called `FoodGroups`. Here, we'll store some default food groups for our "checker" tool. Next, we setup a publication for our `FoodGroups` collection along with a startup script, both on the server.
 
-The startup script is responsible for automatically inserting our default food groups if they don't already exist in the collection. Pay attention, we're making sure that our collection is available _before_ we attempt to insert data into it.
+The startup script is responsible for automatically inserting our default food groups if they don't already exist in the collection. **Pay attention, we're making sure that our collection is available _before_ we attempt to insert data into it**.
 
-The last block is responsible for loading our core package code. Here, we load in the module that contains our `Grindage()` function for actually _checking_ food groups, along with some CSS, HTML, and template logic for a helper template we've made (this gives users of our package a little GUI to use the `Grindage()` function). Lastly, we've created a route using Iron Router so that our users can easily access our template at `http://localhost:3000/grindage`. Sweet!
+The last block is responsible for loading our core package code. Here, we load in the module that contains our `Grindage()` function for actually _checking_ food groups, along with some CSS, HTML, and template logic for a helper template we've made (this gives users of our package a little GUI to use the `Grindage()` function). Lastly, we've created a route using Iron Router so that our users can easily access our template at `http://localhost:3000/grindage`. [Sweet](http://media3.giphy.com/media/tpvLAVK9FopZC/giphy.gif)!
 
 #### api.export
-Okay, so we've loaded all of these files...but how do we actually _see_ what they contain? If you're keen, you may have noticed that packages are hyper-explicit in terms of what they make available to the outside world. If you don't say it, it doesn't happen. In light of this, any symbols (another word for variables, specifically, of the global nature) we want to "export" from our package to the host application can be passed to the `api.export()` method.
+Okay, so we've loaded all of these files...but how do we actually _see_ what they contain? If you're keen, you may have noticed that packages are hyper-explicit in terms of what they make available to the outside world. **If you don't say it, it doesn't happen**. In light of this, any symbols (another word for variables, specifically, of the global nature) we want to "export" from our package to the host application can be passed to the `api.export()` method.
 
-<p class="block-header">/path/to/file</p>
+<p class="block-header">/packages/grindage/package.js</p>
 ```.lang-javascript
 Package.onUse(function(api) {
   [...]
@@ -285,16 +288,18 @@ Package.onUse(function(api) {
 
 For Grindage, we have two exports. Just like with `.use()` and `addFiles()`, we can pass both strings and arrays for both the variables we want to export and the architecture where they should be visible. The only thing to note, here, is that we're passing the _exact name of the variables_ that we want to export. E.g., in our `lib/modules/grindage.js` file, we have a global variable defined called `Grindage`. The same applies to `FoodGroups`, as it's the variable we've assigned our collection definition to in `/lib/collections/food-groups.js`.
 
-If you ever bump into something not being accessible to another file in your package, it's likely that you forgot to export something. Seriously, I've done this 100 times and it will drive you _nuts_.
+If you ever bump into something not being accessible to another file in your package, it's likely that you forgot to export something. Seriously, I've done this a hundred times and it will drive you _nuts_.
 
 Okay! That wraps up the `api.onUse()` block. That was a lot of code. Let's call this a snack break and regroup in about 10-15.
+
+![Eating a Burrito, Budddy](http://media.giphy.com/media/VF72k9dPmlBhS/giphy.gif)
 
 ### Package.onTest
 Duh, duh, duh! Duh duh duh! Duh duh! Too much drama? Let's be honest: this is one of the scariest parts of working with Meteor right now. Testing. Everybody knows they should be doing it, but it's a bit confusing. Don't worry. Up until recently I've been fairly confused by the whole thing and am still trying to understand the bigger picture. No worries, we'll walk through how to test our package here using Meteor's own Tinytest framework. Deep breaths...
 
 Let's dump out our entire `onTest` block and step through it:
 
-<p class="block-header">/path/to/file</p>
+<p class="block-header">/packages/grindage/package.js</p>
 ```.lang-javascript
 Package.onTest(function (api) {
   api.use([
@@ -307,13 +312,15 @@ Package.onTest(function (api) {
 });
 ```
 
-Pretty simple, right? A few familiar pieces. Just like with our `onUse` block, here, we make use of the `api.use()` and `api.addFiles()` methods. What's going on here? Well, when we go to test our package, Meteor will create an isolated environment of sorts to test our package in. This means that we get a fresh database that's wholly independent from the app our package is installed in and the code runs in isolation. Keep in mind: this is _only_ when we're running our tests. Once we've published our package (we'll cover this in a bit), we should consider our code to be "in the wild" and capable of mass destruction.
+Pretty simple, right? A few familiar pieces. Just like with our `onUse` block, here, we make use of the `api.use()` and `api.addFiles()` methods. What's going on here? Well, when we go to test our package, Meteor will create an isolated environment of sorts to test our package in. This means that we get a fresh database that's wholly independent from the app our package is installed in and the code runs in isolation.
 
-In our `api.use()` block, we're calling up two packages: `tinytest`, the testing framework we'll use to actuall define and run our tests, and `themeteorchef:grindage`. Wait...what?! Yep! Here, we can go super-meta and tell our tests to use the package it's testing.
+Keep in mind: this is _only_ when we're running our tests. Once we've published our package (we'll cover this in a bit), we should consider our code to be "in the wild" and capable of mass destruction.
+
+In our `api.use()` block, we're calling up two packages: `tinytest`, the testing framework we'll use to actually define and run our tests, and `themeteorchef:grindage`. Wait...what?! Yep! Here, we can go super-meta and tell our tests to use the package it's testing.
 
 ಠ_ಠ
 
-What this enables us to do is to pull in _all_ of our package code and _all_ of its dependencies in one swoop. This means everything our package needs is made accessible to our testing environment. Nifty, eh? Of course here, we know that our package will be doing work on both the `client` and the `server`, so we make sure to pass both together in array for the architecture field.
+What this enables us to do is to pull in _all_ of our package code and _all_ of its dependencies in one swoop. This means everything our package needs is made accessible to our testing environment. Nifty, eh? Of course here, we know that our package will be doing work on both the `client` and the `server`, so we make sure to pass both together in an array for the architecture field.
 
 Next up, we add two files separately: `client-tests.js` and `server-tests.js`. Fairly self-explanatory, but we need to call attention to the architecture field. In respect to our testing framework, Tinytest, here `client` and `server` are used to denote _where_ the tests need to run.
 
@@ -327,7 +334,7 @@ Wait, wait, wait. We need to discuss advanced package APIs first. There are a fe
 ##### Npm.depends
 Similar to the `api.use()` method we covered above that allows you to depend on _Meteor_ packages, the `Npm.depends()` method allows you to pull in [NPM packages](https://www.npmjs.com/). What's nice about this is that you can easily incorporate functionality from an NPM package that hasn't made it to Meteor yet. This is a good place to start when you're working with things like third-party APIs that are likely to have an NPM package available. Note: calls to `Npm.depends()` also live in your `package.js` file and are included in their own block outside of `Package.onUse()`:
 
-<p class="block-header">package.js</p>
+<p class="block-header">Example package.js</p>
 ```.lang-javascript
 Package.describe({
   [...]  
@@ -351,13 +358,13 @@ The sister function of `Npm.depends()`, `Npm.require()` is what you use to actua
 
 <p class="block-header">/packages/examplepackage/server/methods.js</p>
 ```.lang-javascript
-  ExampleAPI = Npm.require('npm-package-name');
+ExampleAPI = Npm.require('npm-package-name');
 
-  Meteor.methods({
-    methodAddedByPackage: function() {
-      ExampleAPI.method(...);
-    }
-  });
+Meteor.methods({
+  methodAddedByPackage: function() {
+    ExampleAPI.method(...);
+  }
+});
 ```
 
 ##### Cordova.depends()
@@ -386,7 +393,7 @@ Okay! So now that we have a decent understanding of how to organize our `package
 #### File Organization
 Similar to when you first start out writing Meteor applications, you may wonder "how do I organize my package code?" Good question! Not to burst your bubble, but very similar to Meteor applications: there's very little convention. In fact, you can get away with _no_ organization strategy if you want and put all of your files in the root directory for your package (e.g. `/packages/grindage`). Let's explore how Grindage has been organized and why.
 
-<p class="block-header">/path/to/file</p>
+<p class="block-header">/packages/grindage</p>
 ```.lang-bash
 /grindage
 --- /lib
@@ -412,7 +419,7 @@ Inside of the `/grindage` directory, we have two extra directories: `lib` and `t
 ##### /lib
 Lib here is short for library. The point of this directory is to store all of _our_ package code. This is merely a convention, but helps us to keep everything neat and tidy. This includes each of the files that we added using `api.addFiles()`.
 
-Notice, too, that we've further separated our code within the `/lib` directory by purpose/function. This is purely by my own taste. We could easily move everything in these folders to be in the root of `/lib` or in the root of the package. S'up to you.
+Notice, too, that we've further separated our code within the `/lib` directory by purpose/function. This is purely by my own taste. We could easily move everything in these folders to be in the root of `/lib` or in the root of the package. [S'up to you](http://media.giphy.com/media/6rxT0ngUc0B0I/giphy.gif).
 
 The reason I've chosen to use this separation is that it makes it very clear what each file is responsible for to other developers.
 
@@ -427,7 +434,7 @@ The only true convention for organizing our package is to ensure that we have a 
 #### Global vs. Local Variables
 Remember earlier when we used the `api.export()` method to expose global variables from within our package? This is where it all comes together. Let's take a quick look at the source of `/lib/modules/grindage.js`:
 
-<p class="block-header">/path/to/file</p>
+<p class="block-header">/packages/grindage/lib/modules/grindage.js</p>
 ```.lang-javascript
 Grindage = function( foodGroup ) {
   if ( foodGroup ) {
@@ -486,7 +493,7 @@ All of these things, if at least considered, can help to give your package a bit
 
 <div class="note">
   <h3>A quick note</h3>
-  <p>Something I've enjoyed recently that's helped me to wrap my head around all of this stuff is a <a href="http://www.amazon.com/Clean-Code-Handbook-Software-Craftsmanship/dp/0132350882">book</a> and <a href="https://cleancoders.com/category/clean-code#videos">screencast series</a> by a guy who goes by "Uncle Bob Martin." He's an older, experience deveoper who's developed a solid phiolosophy around writing clean code. It's worth hearing him out as a lot of his stuff can help to make immediate improvements in your work.</p>
+  <p>Something I've enjoyed recently that's helped me to wrap my head around all of this stuff is a <a href="http://www.amazon.com/Clean-Code-Handbook-Software-Craftsmanship/dp/0132350882">book</a> and <a href="https://cleancoders.com/category/clean-code#videos">screencast series</a> by a guy who goes by "Uncle Bob Martin." He's an older, more experienced deveoper who's developed a phiolosophy around writing clean code. It's worth hearing him out as a lot of his stuff can help to make immediate improvements in your work.</p>
 </div>
 
 #### Documenting APIs with JSDOC
@@ -494,7 +501,7 @@ In conjunction with writing clean code is _documenting_ your code. Now, this can
 
 [JSDoc](http://usejsdoc.org/) is a code documentation standard that helps you to comment your code in a meaningful way. It also helps you to auto-generate documentation for your code in the form of HTML files. To get an idea of what we're talking about, let's look at an example from Grindage.
 
-<p class="block-header">/path/to/file</p>
+<p class="block-header">/packages/grindage/lib/modules/grindage.js</p>
 ```.lang-javascript
 /**
 * themeteorchef:grindage
@@ -542,7 +549,7 @@ Think of it like this: in our Grindage package, we have a function `Grindage()` 
 
 Writing a test allows us to automate the process of testing each input variation. Let's take a look at one of our client-side tests for Grindage.
 
-<p class="block-header">/path/to/file</p>
+<p class="block-header">/packages/grindage/tests/client/client-tests.js</p>
 ```.lang-javascript
 Tinytest.add('Does the Grindage function return TRUE for an existing group?', function( test ) {
   var testGroup = Grindage( 'dairy' );
@@ -552,7 +559,7 @@ Tinytest.add('Does the Grindage function return TRUE for an existing group?', fu
 
 This is an individual test. Ignore the syntax for a bit (we'll cover that soon) and look at what we're doing inside. Here, we're calling our `Grindage()` function from the client, passing it a food group that we're certain exists. Next, we assign the return value of our function (either `true` or `false`) to a variable called `testGroup`. Lastly, we "verify" that passing `"dairy"` as our value returns _true_. Let's look at the inverse of this, testing with a non-existent food group.
 
-<p class="block-header">/path/to/file</p>
+<p class="block-header">/packages/grindage/tests/client/client-tests.js</p>
 ```.lang-javascript
 Tinytest.add('Does the Grindage function return FALSE for a non-existent group?', function( test ) {
   var testGroup = Grindage( 'tacos' );
@@ -581,7 +588,7 @@ Okay, so we're convinced we need tests. How do we do it? Fortunately for us, Met
 
 Tinytest is fairly minimal. It has a [simple API](https://github.com/awatson1978/meteor-cookbook/blob/master/cookbook/writing.unit.tests.md#tinytest-api) of 11 methods that we can use to test values. To keep things simple, we'll focus specifically on two of those methods: `test.equal()` and `test.notEqual()`. Let's look at the anatomy of a test.
 
-<p class="block-header">/path/to/file</p>
+<p class="block-header">/packages/grindage/tests/client/client-tests.js</p>
 ```.lang-javascript
 Tinytest.add('Is the grindage template available on the client?', function( test ) {
   test.notEqual( typeof Template.grindage, "undefined" );
@@ -594,7 +601,7 @@ Pay attention to the wording, though. Because we're using `test.notEqual()` here
 
 Let's look at another, slightly more complicated test.
 
-<p class="block-header">/path/to/file</p>
+<p class="block-header">/packages/grindage/tests/client/client-tests.js</p>
 ```.lang-javascript
 Tinytest.addAsync('Does the FoodGroups collection have documents on the client?', function( test, next ) {
   Meteor.subscribe('foodGroups', function() {
@@ -605,9 +612,9 @@ Tinytest.addAsync('Does the FoodGroups collection have documents on the client?'
 });
 ```
 
-What the fudge is this? Notice that for this test, instead of using `Tinytest.add()` we're using `Tinytest.addAsync()`. What's up with that? This is just another variation of a Tinytest that we can write that allows us to test code that's asynchronous or non-blocking. One of the features of our package is that it publishes a set of "allowed" food groups to the client.
+[What the fudge is this](http://media.giphy.com/media/pz904hDqFJv1u/giphy.gif)? Notice that for this test, instead of using `Tinytest.add()` we're using `Tinytest.addAsync()`. What's up with that? This is just another variation of a Tinytest that we can write that allows us to test code that's asynchronous or non-blocking. One of the features of our package is that it publishes a set of "allowed" food groups to the client.
 
-In order to verify that our publication and subscription are working on the client, we need to use an async test because our subscription loads _asynchronously_. This means we need to "wait" until our subscription is ready before performing our test. Confused? Dont' worry, I was (am) too. It's not the clearest concept. Let's step through it.
+In order to verify that our publication and subscription are working on the client, we need to use an async test because our subscription loads _asynchronously_. This means we need to "wait" until our subscription is ready before performing our test. Confused? Don't worry, I was (am) too. It's not the clearest concept. Let's step through it.
 
 First, notice that in our test's callback function, we've added an additional argument `next` that points to a function telling Tinytest to "continue" when it's called. Next, we make a call to `Meteor.subscribe('foodGroups')` the publication we've defined in our package. Lastly, we pass a callback function (also known as the "on ready" event) to our subscription.
 
@@ -621,15 +628,15 @@ So. That's a quick look at tests. In reality, there's a lot of hiddden complexit
 
 <div class="note">
   <h3>A quick note</h3>
-  <p>If you're interested in learning more about testing with Meteor, I recommend checking out Sam Hatoum's book <a href="http://www.meteortesting.com">The Meteor Testing Manual</a>. As a special gift for readers of this recipe, you can <strong>use <a href="https://gumroad.com/l/CjWVEw/ttmc">this code</a> to save 15%</strong> when you buy the book! <strong>This coupon is only good until May 27th, 2015 so act quick.</strong></p>
+  <p>If you're interested in learning more about testing with Meteor, I recommend checking out Sam Hatoum's book <a href="http://www.meteortesting.com">The Meteor Testing Manual</a>. As a special gift for readers of this recipe, you can <strong>use <a href="https://gumroad.com/l/CjWVEw/ttmc">this code</a> to save 15%</strong> when you buy the book! <strong>This coupon is only good until June 1st, 2015 so act quick.</strong></p>
 </div>
 
 #### What should we test?
 So we've seen how to write a test but how can we know _what_ to test? Ah, right. This is tricky. I've found that asking the question "what code have I written that can break?" is incredibly helpful. Even more, think about this on a very granular, small level. A test ideally looks at one thing. Notice in our examples we had one test just for testing if the template was visible. Another for testing if our function worked. That's the idea: start small.
 
-What will really cook your melon is that there are different kinds of tests. That's outside of the scope of this recipe, but what we're covering here is known as a "unit" test. Like it sounds, unit tests are designed to test individual _units_ of code. A single function. Making sure a template exists. Little stuff. Use your best judgment and test the stuff that _could_ break, even if you think your code is perfect.
+What will really [cook your melon](http://media.giphy.com/media/147loIoFnf9E1q/giphy.gif) is that there are different kinds of tests. That's outside of the scope of this recipe, but what we're covering here is known as a "unit" test. Like it sounds, unit tests are designed to test individual _units_ of code. A single function. Making sure a template exists. Little stuff. Use your best judgment and test the stuff that _could_ break, even if you think your code is perfect.
 
-There's a lot of hullabaloo from the other nerds out there that you need to have a bunch of tests. Much like anything else in web development: it depends. Again, don't be overwhelmed. Start with something small like unit tests and work your way up to the other stuff.
+There's a lot of hullabaloo from the other nerds out there that you need to have a bunch of tests. Much like anything else in web development: it depends. Again, don't be overwhelmed. Start with something small like unit tests and work your way up to the other stuff. What matters is that you're proactive about it and just _trying_.
 
 #### Running tests
 Alright...we've written tests. Now we have to actually run them. Run them? Yeah.
@@ -638,7 +645,7 @@ Running tests is the automated part of this. It's also where all of this comes t
 
 First, we need to make sure that we have Tinytest installed. When we're developing packages, it's best to have our package added to a test app. Let's add Tinytest to that app quick.
 
-<p class="block-header">/path/to/file</p>
+<p class="block-header">Terminal</p>
 ```.lang-bash
 meteor add tinytest
 ```
@@ -656,7 +663,7 @@ Running `meteor test-packages` like this allows us to run _only_ the tests for o
 
 Awesome! Here we can see all of our tests passing. A fun experiment to try here is to open up the tests while this is running and attempt to break them. For example, if we change the first test in our `/tests/client/client-tests.js` file to read like this:
 
-<p class="block-header">/path/to/file</p>
+<p class="block-header">Failing Test Example</p>
 ```.lang-javascript
 Tinytest.add('Is the grindage template available on the client?', function( test ) {
   test.equal( typeof Template.grindage, "tacos" );
@@ -671,9 +678,10 @@ We get a result like this:
 Pretty handy. As you can see, we're trying to get all green tests. If we get a `FAIL`, that means we need to check our code to see that it's performing as expected.
 
 #### Do I have to test?
-Good question! If you want to consider your work professional: yes. Testing is a necessary evil that actually becomes quite fun once you get the hang of it. It challenges you to write better code that's more performant. It also helps you sleep like a baby at night. If you've ever shipped a codebase untested, you've definitely had night terrors of bugs causing a ruckus in production.
+If you want to consider your work professional: yes. Testing is a necessary evil that actually becomes quite fun once you get the hang of it. It challenges you to write better code that's more performant. It also helps you sleep like a baby at night. If you've ever shipped a codebase untested, you've definitely had night terrors of bugs causing a ruckus in production.
 
-Be smart. Be safe. Test yout stuff.
+Definitive answer: test. It doesn't have to be excessive or perfect, but at least give it a try. Not writing tests only introduces headaches later. [Don't be _that guy_](http://media1.giphy.com/media/zUZ0pvGMyNVqU/giphy.gif).
+
 
 ### Writing a README
 Pretty great stuff, right? At this point we have a functioning, tested package that we're ready to release. But wait! There's a very important step that we need to complete: documentation. Seriously?!
@@ -682,16 +690,16 @@ Yes. If you've ever attempted to use a package (or any code for that matter) tha
 
 1. Define the package. What does it do? Who is it for? What problem does it help to solve? Provide examples here. Give me an example of what my code will look like when I use your package.
 2. Explain the API. What are the public functions/methods? How do they work? What parameters do they take and what types? This is where you explain what Lego parts are in the bin so we know what we can build with.
-3. Outline your tests and how to run them. Make sure people using your package know how to test it. My personal favorite is to include instructions for running the test along with a screenshot of the tests passing.
+3. Outline your tests and how to run them. Make sure people using your package know how to test it. [My personal favorite](https://github.com/themeteorchef/controller#tests) is to include instructions for running the test along with a screenshot of the tests passing.
 4. Provide a license. This is mostly important for businesses and developers within corporations. A license lets developers know what restrictions you've placed on your code and how they can use it.
 
 Don't skimp on your README. If you want/expect developers to use your package, look at your README as the number one way to communicate its value. This is the marketing site for your package. Give it a little T.L.C.
 
 ### Versioning Your Package
-We're almost there! The last thing we need to talk about before we release our package is versioning. This is **super important**. Versioning is how we tell Meteor (and other developers) when our code was last updated and how. In order to do this, we use something called semantic versioning.
+We're almost there! The last thing we need to talk about before we release our package is versioning. This is **super important**. Versioning is how we tell Meteor (and other developers) when our code was last updated and how. In order to do this, we use something called [Semantic Versioning](http://semver.org/).
 
 #### Using Semantic Versioning
-Semantic versioning implies a three number version scheme: `<major>.<minor>.<bug>`. Here's what this means:
+Semantic versioning implies a three number version scheme: `<major>.<minor>.<patch>`. Here's what this means:
 
 > Given a version number MAJOR.MINOR.PATCH, increment the:
 >
@@ -704,17 +712,19 @@ Semantic versioning implies a three number version scheme: `<major>.<minor>.<bug
 >
 > PATCH version when you make backwards-compatible bug fixes.
 
-So, we can start our package at something like `1.0.0` when we release it and update from there. For example, say we release `1.0.0` but we find a bug. Once we've fixed that bug, we'd bump the version to `1.0.1`. Another example could be we add some functionality that works with the existing code (backwards compatible), so we bump it to `1.1.0`. Notice that for each "tier," we reset to `0`. It's important to note that each version should be "frozen." This means that once you've released something at `1.5.0`, the code cannot change without a version bump. So if we were to fix a bug in `1.5.0`, we _must_ bump it to `1.5.1`.
+So, we can start our package at something like `1.0.0` when we release it and update from there. For example, say we release `1.0.0` but we find a bug. Once we've fixed that bug, we'd bump the version to `1.0.1`. Another example could be we add some functionality that works with the existing code (backwards compatible), so we bump it to `1.1.0`.
+
+Notice that for each "tier," we reset to `0`. It's important to note that each version should be "frozen." This means that once you've released something at `1.5.0`, the code cannot change without a version bump. So if we were to fix a bug in `1.5.0`, we _must_ bump it to `1.5.1`.
 
 #### Updating Package.js
 Whenever we write a new version of our package (again, to fix a bug or add functionality), we need to make note of our version number in our `package.js` file. This is mandatory. If we change our code and go to publish it without changing the `version` field in our `Package.describe()` block, Meteor will throw a hissy fit.
 
 #### Tagging on GitHub
-I can't stress this enough. It's super important to _tag your releases on GitHub_. Tagging is the act of "marking" a batch of code as a release. For example, say my code is at `1.8.0` and I make some major changes bumping it to `2.0.0`. When I push the changes that make the code `2.0.0` (e.g. we'll say five commits), I can "tag" that point in time as a release. Tagging is done directly from Git using the command `git tag -a <version>`.
+I can't stress this enough. It's super important to _tag your releases on GitHub_. [Tagging](http://git-scm.com/book/en/v2/Git-Basics-Tagging) is the act of "marking" a batch of code as a release. For example, say my code is at `1.8.0` and I make some major changes bumping it to `2.0.0`. When I push the changes that make the code `2.0.0` (e.g. we'll say five commits), I can "tag" that point in time as a release. Tagging is done directly from Git using the command `git tag -a <version>`.
 
 In our case, once we've commited some code to master and pushed it, assuming we're at version `2.0.0` we'd tag it by doing:
 
-<p class="block-header">/path/to/file</p>
+<p class="block-header">Terminal</p>
 ```.lang-bash
 # Step One
 git tag -a 2.0.0
@@ -734,18 +744,22 @@ Once you've pushed your tags to GitHub, you'll be able to see them (and click on
 ![Base Tags](http://cl.ly/image/2B0S1z0j2j2b/Image%202015-05-13%20at%2011.19.08%20AM.png)
 
 ### Releasing Your Package
-Finally! It's time to release our package into the wild. At this point, we've got our code up on GitHub, it's tagged, our `package.js` has its `version` set to `1.0.0` and we're ready to go live. This is...underwhelming (which is a good thing). To release our package (making it accessible on Atmosphere and to developers) we do:
+Finally! It's time to release our package into the wild. At this point, we've got our code up on GitHub, it's tagged, our `package.js` has its `version` set to `1.0.0` and we're ready to go live. This is...underwhelming (which is a good thing). To release our package (making it accessible on [Atmosphere](https://atmospherejs.com) and to developers), from our package directory we do:
 
-<p class="block-header">/path/to/file</p>
+<p class="block-header">Terminal</p>
 ```.lang-bash
-  meteor publish --create
+meteor publish --create
 ```
 
-That's it! Meteor will do the rest. Note that here we've added the `--create` flag as this is the _first time_ we're publishing this package. On each subsequent version, we'd just do:
+That's it! Meteor will do the rest. Note that here we've added the `--create` flag as this is the _first time_ we're publishing this package. It's also important to note that when you do this, if you're not already, Meteor will ask you to login using your [Meteor developer account](http://meteor.com). If you don't have one setup, you'll need to before publishing your package.
 
-<p class="block-header">/path/to/file</p>
+![Registering a developer account](http://cl.ly/ay2D/meteor-dev-account.gif)
+
+On each subsequent version of our package, to publish we'd just do:
+
+<p class="block-header">Terminal</p>
 ```.lang-bash
-  meteor publish
+meteor publish
 ```
 
 Super simple. Congratulations! You've just released a package. Now the real work begins.
@@ -754,15 +768,20 @@ Super simple. Congratulations! You've just released a package. Now the real work
 Silly you. You didn't think we'd just stop with releasing, did you? No. Before we part ways, we need to talk about _maintaining_ our package. Fixing bugs, adding functionality, and responding to other developers questions and requests. It's actually a lot of fun.
 
 #### GitHub Issues
-The first thing you'll want to do is familiarize yourself with GitHub's issues feature. It's a simple issue tracker built right into each of your repositories. This makes it easy for other developers (yourself, too) to jot down issues related to your code. Issues are not just "problems," they can also be feature requests, questions, or things you'd like to refactor. GitHub places no restriction on the type of labels you can apply to issues, so go nuts and have a `gnarly` label if you'd like.
+The first thing you'll want to do is familiarize yourself with [GitHub's issues feature](https://guides.github.com/features/issues/). It's a simple issue tracker built right into each of your repositories. This makes it easy for other developers (yourself, too) to jot down issues related to your code. Issues are not just "problems," they can also be feature requests, questions, or things you'd like to refactor. GitHub places no restriction on the type of labels you can apply to issues, so go nuts and have a `gnarly` label if you'd like.
 
 #### Responding to Issues
 As a published package developer, you now hold the responsibility of keeping up with your code. No (sane) person is expecting you to update your code constantly, but as a cortousey to your fellow developers, it's good practice to respond to issues dilligently. This requires a bit of self-composure. Developers are known for being a feisty bunch and can sometimes leave not-so-friendly comments on your code. Don't take it personally.
 
-The goal with any issues that are submitted for your code is to understand what problem (or idea) they have, whether or not it can be fixed, and work with them to solve it. Again, this is the real world. You have to take your cat to its circus training class and we all gotta munch on some grindage. You don't have to respond _instantly_, but make sure to follow up on stuff. Remember: people opening issues on your code is a sign that they want to use it and they like. Keeping up a good report with these folks helps to give your package momentum and encourage usage.
+The goal with any issues that are submitted for your code is to understand what problem (or idea) they have, whether or not it can be fixed, and work with them to solve it. Again, this is the real world. You have to take your cat to its circus training class and we all gotta munch on some grindage. You don't have to respond _instantly_, but make sure to follow up on stuff. Remember: people opening issues on your package is a sign that they want to use it and they like it. Keeping up a good report with these folks helps to give your package momentum and encourage usage.
 
 #### Testing Issues
 Lastly, it's important to note that you need to carefully test issues. Following our pattern from above, if a bug is reported, take it seriously. Open up your repo locally, create a new branch, and attempt to recreate the bug. Once you do, work to fix it and then _test your fix_. No matter how small, it's important to confirm that any unwanted behavior is corrected _before_ you release an update. Once you're certain that the fix is working, follow the versioning and release steps above.
+
+<div class="note">
+  <h3>A quick note</h3>
+  <p>This is where tests come in. Some bugs are just a flaw in our code's logic. If we find a bug, we can write a test along with our fix to make sure that the bug is definitely gone.</p>
+</div>
 
 #### Updating Code
 Fixing bugs, adding features, and anything else related to changing your code can be bundled up as "updating code." When we do, we need to follow a process to make sure we're shipping top notch packages. Here's an example workflow to guide your thinking:
@@ -770,6 +789,10 @@ Fixing bugs, adding features, and anything else related to changing your code ca
 ![Development Workflow](http://cl.ly/image/2z3k2F36133x/Image%202015-05-13%20at%2011.36.58%20AM.png)
 
 ### Wrap Up & Summary
-Boom! It was a long road, but we now have a complete understanding of how to develop, test, and release packages! We even learned how to maintain our package so other developers are encouraged to use and contribute to our package.
+Boom! It was a long road, but we now have a complete understanding of how to develop, test, and release packages! We also learned how to write a README for our package as well as how to maintain our package so other developers are encouraged to use and contribute to our package.
 
-You now hold an immense amount of power in your hands. Go forth and conquer! Make sure to share any packages you come up with in the comments :)
+You now hold an immense amount of power in your hands. Go ahead, dance like an idiot. You deserve it!
+
+![Link dancing](http://media.giphy.com/media/tYZY1gx1R0tgY/giphy.gif)
+
+P.S. Make sure to share any packages you come up with in the comments :)
