@@ -183,8 +183,8 @@ Package.onUse(function(api) {
   [...]
 
   api.use(["templating", "underscore"]);
-  api.use(["iron:router"], 'client', {weak: false, unordered: false});
-  api.use(["themeteorchef:controller"], 'client');
+  api.use(["iron:router@1.0.7"], 'client', {weak: false, unordered: false});
+  api.use(["themeteorchef:controller@1.2.0"], 'client');
 
   [...]
 });
@@ -206,7 +206,12 @@ The name of the game for now is to get comfortable browsing the source of the co
 A bit of wisdom if you're just getting started: don't let this process frustrate you. It _is_ a bit tedious at first, but you pick it up pretty quickly. It can even be fun picking apart each of the core packages to learn how they work and what they depend on under the hood. Don't give up! Just pop open the [packages directory](https://github.com/meteor/meteor/tree/devel/packages) and when in doubt read the `package.js` file for the packages that sound like what you need.
 
 ##### Third-Party Dependency w/ Options
-Just beneath our core dependencies, we're loading in a third-party dependency for the `iron:router` package `api.use(["iron:router"], 'client', {weak: false, unordered: false});`. Here, instead of just passing a string (or array of strings) for dependencies, we're also setting the `architecture` parameter and the `options` parameter.
+Just beneath our core dependencies, we're loading in a third-party dependency for the `iron:router` package `api.use(["iron:router@1.0.7"], 'client', {weak: false, unordered: false});`. Here, instead of just passing a string (or array of strings) for dependencies, we're also setting the `architecture` parameter and the `options` parameter.
+
+<div class="note">
+  <h3>A quick note</h3>
+  <p>You'll notice that our iron:router and themeteorchef:controller packages have an @version after them. This is because Meteor will ask us to pin third-party packages to a version when we go to publish. What we've denoted here are the latest versions for those packages as of writing.</p>
+</div>
 
 The `architecture` parameter here simply denotes _where_ that dependencies code should be loaded. Again, this could be `client`, `server`, `web.browser`, `web.cordova`, or an array like `['client', 'server', 'web.cordova']`.
 
