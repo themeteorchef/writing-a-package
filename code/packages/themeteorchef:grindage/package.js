@@ -12,8 +12,8 @@ Package.onUse(function(api) {
   // Dependencies
   // Packages that our package is dependent on to work.
   api.use(["templating", "underscore"]);
-  api.use(["iron:router"], 'client', {weak: false, unordered: false});
-  api.use(["themeteorchef:controller"], 'client');
+  api.use(["iron:router@1.0.7"], 'client', {weak: false, unordered: false});
+  api.use(["themeteorchef:controller@1.2.0"], 'client');
 
   // Package Files
   // The actual files that make up our package. Note: unlike a Meteor app,
