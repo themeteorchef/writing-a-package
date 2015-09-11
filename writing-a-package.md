@@ -93,7 +93,7 @@ Cool! This should have added a new directory to your `/packages` directory calle
 
 <div class="note">
   <h3>A quick note</h3>
-  <p>In order to guide you in the package writing process, I'd recommend checking out a little tool by my buddy Dean Radcliffe (<a href="http://twitter.com/chicagogrooves">@chicagogrooves</a>) called <a href="http://package-kitchen.meteor.com">Package Kitchen</a>. It's super handy for spinning up new packages. Check it out!</p>
+  <p>In order to guide you in the package writing process, I'd recommend checking out a little tool by my buddy Dean Radcliffe (<a href="http://twitter.com/deaniusdev">@deaniusdev</a>) called <a href="http://bit.ly/meteor-package">Package Kitchen</a>. It's super handy for spinning up new packages. Check it out!</p>
 </div>
 
 But wait, what's up with the colon convention in the demo?
