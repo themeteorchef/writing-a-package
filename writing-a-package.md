@@ -2,6 +2,7 @@
 Because the focus of this recipe is on writing a package, we won't be adding too many packages to our actual application. To get started, we just need one: Tinytest.
 
 <p class="block-header">Terminal</p>
+
 ```.lang-bash
 meteor add tinytest
 ```
@@ -24,6 +25,7 @@ In order to set `PACKAGE_DIRS`, you need to export it to your shell. Let's look 
 For Bash, add the following to the end of your `~/.bash_profile`:
 
 <p class="block-header">~/.bash_profile</p>
+
 ```.lang-bash
 # Define PACKAGE_DIRS for Local Meteor Packages
 export PACKAGE_DIRS="$HOME/path/to/packages"
@@ -32,6 +34,7 @@ export PACKAGE_DIRS="$HOME/path/to/packages"
 Here, `/path/to/packages` is quite literally the folder path to where you keep your packages. A good example of this could be `/projects/meteor/packages`. The `$HOME` prefix here simply points the start of the path to your home directory, or, `~`.
 
 <p class="block-header">~/.zprofile</p>
+
 ```.lang-bash
 # Define PACKAGE_DIRS for Local Meteor Packages
 export PACKAGE_DIRS="$HOME/path/to/packages"
@@ -47,6 +50,7 @@ Same thing for Zsh, but note that the profile is located in `~/.zprofile` instea
 Lastly, we need to tell our Meteor app about our package. In order to do this, from our Meteor project's root in the Terminal:
 
 <p class="block-header">Terminal</p>
+
 ```.lang-bash
 meteor add author:package-name
 ```
@@ -83,6 +87,7 @@ Got it? Great. So we have four basic food groups. In order to ensure that our (a
 Next, we need to create our package. We can do this manually, or, we can be smart and use a handy little command built into Meteor (make sure to `cd` into the `packages` directory of your project before doing this):
 
 <p class="block-header">Terminal</p>
+
 ```.lang-bash
 meteor create --package author:package-name
 ```
@@ -112,6 +117,7 @@ The first thing we want to do is open up our `package.js` file inside of our fre
 The describe block in your `package.js` file does exactly what it says: describes your package. More specifically, this is the information that Meteor uses to register the package with the Meteor package system. It contains the name of the package, a summary of what the package does, a version number, a Git repository link, and the path to the package's documentation (relative to the package directory).
 
 <p class="block-header">/packages/grindage/package.js</p>
+
 ```.lang-javascript
 Package.describe({
   name: "themeteorchef:grindage",
@@ -152,7 +158,9 @@ The next—and most important—block of our `package.js` file is the `Package.o
 The first thing to point out is that within our block, Meteor passes an `api` argument that we can use. The `api` variable contains all of the methods that we'll need to define dependencies, files, and exports for our package.
 
 ##### api.versionsFrom
+
 <p class="block-header">/packages/grindage/package.js</p>
+
 ```.lang-javascript
 Package.onUse(function(api) {
   api.versionsFrom("1.0.1");
@@ -178,6 +186,7 @@ Next up is the `.use()` method which is responsible for defining external packag
 Let's take a look at our Grindage package to see a few different versions of using `api.use()`.
 
 <p class="block-header">/packages/grindage/package.js</p>
+
 ```.lang-javascript
 Package.onUse(function(api) {
   [...]
@@ -243,6 +252,7 @@ The big show! `api.addFiles()` does exactly what you think: adds the files for y
 The reason Meteor does this like this is that it allows us to specify a _load order_. So, if one file has a function that a later file needs, we can load that one _first_ to make sure it's ready before the other one. Simple! Let's look at Grindage to see how we're doing this:
 
 <p class="block-header">/packages/grindage/package.js</p>
+
 ```.lang-javascript
 Package.onUse(function(api) {
   [...]
@@ -282,6 +292,7 @@ The last block is responsible for loading our core package code. Here, we load i
 Okay, so we've loaded all of these files...but how do we actually _see_ what they contain? If you're keen, you may have noticed that packages are hyper-explicit in terms of what they make available to the outside world. **If you don't say it, it doesn't happen**. In light of this, any symbols (another word for variables, specifically, of the global nature) we want to "export" from our package to the host application can be passed to the `api.export()` method.
 
 <p class="block-header">/packages/grindage/package.js</p>
+
 ```.lang-javascript
 Package.onUse(function(api) {
   [...]
@@ -305,6 +316,7 @@ Duh, duh, duh! Duh duh duh! Duh duh! Too much drama? Let's be honest: this is on
 Let's dump out our entire `onTest` block and step through it:
 
 <p class="block-header">/packages/grindage/package.js</p>
+
 ```.lang-javascript
 Package.onTest(function (api) {
   api.use([
@@ -340,6 +352,7 @@ Wait, wait, wait. We need to discuss advanced package APIs first. There are a fe
 Similar to the `api.use()` method we covered above that allows you to depend on _Meteor_ packages, the `Npm.depends()` method allows you to pull in [NPM packages](https://www.npmjs.com/). What's nice about this is that you can easily incorporate functionality from an NPM package that hasn't made it to Meteor yet. This is a good place to start when you're working with things like third-party APIs that are likely to have an NPM package available. Note: calls to `Npm.depends()` also live in your `package.js` file and are included in their own block outside of `Package.onUse()`:
 
 <p class="block-header">Example package.js</p>
+
 ```.lang-javascript
 Package.describe({
   [...]  
@@ -362,6 +375,7 @@ Package.onTest(function(api){
 The sister function of `Npm.depends()`, `Npm.require()` is what you use to actually _load_ the package included using `Npm.depends()`. `Npm.require()` calls are used _inside of_ your package code. For example, if one of your package files contained a few methods:
 
 <p class="block-header">/packages/examplepackage/server/methods.js</p>
+
 ```.lang-javascript
 ExampleAPI = Npm.require('npm-package-name');
 
@@ -399,6 +413,7 @@ Okay! So now that we have a decent understanding of how to organize our `package
 Similar to when you first start out writing Meteor applications, you may wonder "how do I organize my package code?" Good question! Not to burst your bubble, but very similar to Meteor applications: there's very little convention. In fact, you can get away with _no_ organization strategy if you want and put all of your files in the root directory for your package (e.g. `/packages/grindage`). Let's explore how Grindage has been organized and why.
 
 <p class="block-header">/packages/grindage</p>
+
 ```.lang-bash
 /grindage
 --- /lib
@@ -440,6 +455,7 @@ The only true convention for organizing our package is to ensure that we have a 
 Remember earlier when we used the `api.export()` method to expose global variables from within our package? This is where it all comes together. Let's take a quick look at the source of `/lib/modules/grindage.js`:
 
 <p class="block-header">/packages/grindage/lib/modules/grindage.js</p>
+
 ```.lang-javascript
 Grindage = function( foodGroup ) {
   if ( foodGroup ) {
@@ -507,6 +523,7 @@ In conjunction with writing clean code is _documenting_ your code. Now, this can
 [JSDoc](http://usejsdoc.org/) is a code documentation standard that helps you to comment your code in a meaningful way. It also helps you to auto-generate documentation for your code in the form of HTML files. To get an idea of what we're talking about, let's look at an example from Grindage.
 
 <p class="block-header">/packages/grindage/lib/modules/grindage.js</p>
+
 ```.lang-javascript
 /**
 * themeteorchef:grindage
@@ -555,6 +572,7 @@ Think of it like this: in our Grindage package, we have a function `Grindage()` 
 Writing a test allows us to automate the process of testing each input variation. Let's take a look at one of our client-side tests for Grindage.
 
 <p class="block-header">/packages/grindage/tests/client/client-tests.js</p>
+
 ```.lang-javascript
 Tinytest.add('Does the Grindage function return TRUE for an existing group?', function( test ) {
   var testGroup = Grindage( 'dairy' );
@@ -565,6 +583,7 @@ Tinytest.add('Does the Grindage function return TRUE for an existing group?', fu
 This is an individual test. Ignore the syntax for a bit (we'll cover that soon) and look at what we're doing inside. Here, we're calling our `Grindage()` function from the client, passing it a food group that we're certain exists. Next, we assign the return value of our function (either `true` or `false`) to a variable called `testGroup`. Lastly, we "verify" that passing `"dairy"` as our value returns _true_. Let's look at the inverse of this, testing with a non-existent food group.
 
 <p class="block-header">/packages/grindage/tests/client/client-tests.js</p>
+
 ```.lang-javascript
 Tinytest.add('Does the Grindage function return FALSE for a non-existent group?', function( test ) {
   var testGroup = Grindage( 'tacos' );
@@ -594,6 +613,7 @@ Okay, so we're convinced we need tests. How do we do it? Fortunately for us, Met
 Tinytest is fairly minimal. It has a [simple API](https://github.com/awatson1978/meteor-cookbook/blob/master/cookbook/writing.unit.tests.md#tinytest-api) of 11 methods that we can use to test values. To keep things simple, we'll focus specifically on two of those methods: `test.equal()` and `test.notEqual()`. Let's look at the anatomy of a test.
 
 <p class="block-header">/packages/grindage/tests/client/client-tests.js</p>
+
 ```.lang-javascript
 Tinytest.add('Is the grindage template available on the client?', function( test ) {
   test.notEqual( typeof Template.grindage, "undefined" );
@@ -607,6 +627,7 @@ Pay attention to the wording, though. Because we're using `test.notEqual()` here
 Let's look at another, slightly more complicated test.
 
 <p class="block-header">/packages/grindage/tests/client/client-tests.js</p>
+
 ```.lang-javascript
 Tinytest.addAsync('Does the FoodGroups collection have documents on the client?', function( test, next ) {
   Meteor.subscribe('foodGroups', function() {
@@ -651,6 +672,7 @@ Running tests is the automated part of this. It's also where all of this comes t
 First, we need to make sure that we have Tinytest installed. When we're developing packages, it's best to have our package added to a test app. Let's add Tinytest to that app quick.
 
 <p class="block-header">Terminal</p>
+
 ```.lang-bash
 meteor add tinytest
 ```
@@ -658,6 +680,7 @@ meteor add tinytest
 Cool? Okay. The next step is to run the tests. If you have a server running, go ahead and `CTRL + C` to stop it in your terminal. Next, run:
 
 <p class="block-header">Terminal</p>
+
 ```.lang-bash
 meteor test-packages packages/themeteorchef:grindage
 ```
@@ -669,6 +692,7 @@ Running `meteor test-packages` like this allows us to run _only_ the tests for o
 Awesome! Here we can see all of our tests passing. A fun experiment to try here is to open up the tests while this is running and attempt to break them. For example, if we change the first test in our `/tests/client/client-tests.js` file to read like this:
 
 <p class="block-header">Failing Test Example</p>
+
 ```.lang-javascript
 Tinytest.add('Is the grindage template available on the client?', function( test ) {
   test.equal( typeof Template.grindage, "tacos" );
@@ -730,6 +754,7 @@ I can't stress this enough. It's super important to _tag your releases on GitHub
 In our case, once we've commited some code to master and pushed it, assuming we're at version `2.0.0` we'd tag it by doing:
 
 <p class="block-header">Terminal</p>
+
 ```.lang-bash
 # Step One
 git tag -a 2.0.0
@@ -752,6 +777,7 @@ Once you've pushed your tags to GitHub, you'll be able to see them (and click on
 Finally! It's time to release our package into the wild. At this point, we've got our code up on GitHub, it's tagged, our `package.js` has its `version` set to `1.0.0` and we're ready to go live. This is...underwhelming (which is a good thing). To release our package (making it accessible on [Atmosphere](https://atmospherejs.com) and to developers), from our package directory we do:
 
 <p class="block-header">Terminal</p>
+
 ```.lang-bash
 meteor publish --create
 ```
@@ -763,6 +789,7 @@ That's it! Meteor will do the rest. Note that here we've added the `--create` fl
 On each subsequent version of our package, to publish we'd just do:
 
 <p class="block-header">Terminal</p>
+
 ```.lang-bash
 meteor publish
 ```
