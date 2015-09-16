@@ -84,7 +84,7 @@ Got it? Great. So we have four basic food groups. In order to ensure that our (a
   <p>You can tackle this recipe by writing everything from scratch, or, if you just want to follow along, you can <a href="https://github.com/themeteorchef/writing-a-package">clone the source on GitHub</a>. Both are valid options!</p>
 </div>
 
-Next, we need to create our package. We can do this manually, or, we can be smart and use a handy little command built into Meteor (make sure to `cd` into the `packages` directory of your project before doing this):
+Next, we need to create our package. We can do this manually, or, we can be smart and use a handy little command built into Meteor (this can be run from your project's root):
 
 <p class="block-header">Terminal</p>
 
